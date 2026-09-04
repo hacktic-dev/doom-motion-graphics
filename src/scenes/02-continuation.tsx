@@ -1,7 +1,6 @@
 import {Circle, Line, Node, Path, Rect, Txt, makeScene2D} from '@motion-canvas/2d';
 import {
   all,
-  chain,
   createRef,
   easeInOutCubic,
   easeOutCubic,
@@ -107,10 +106,10 @@ export default makeScene2D(function* (view) {
       />
 
       {/* One evolving data object: color, then position, then transparency. */}
-      <Circle ref={redStamp} x={-420} y={50} width={280} height={280} fill={'#ef5350'} opacity={0} />
-      <Circle ref={greenStamp} y={50} width={280} height={280} fill={'#66bb6a'} opacity={0} />
-      <Circle ref={blueStamp} x={420} y={50} width={280} height={280} fill={'#42a5f5'} opacity={0} />
-      <Circle ref={dataOrb} width={280} height={280} fill={'#ef5350'} opacity={0} scale={0.08} zIndex={2} />
+      <Circle ref={redStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} zIndex={2} />
+      <Circle ref={greenStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} />
+      <Circle ref={blueStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} />
+      <Circle ref={dataOrb} width={230} height={230} fill={'#ffffff'} stroke={'#d0d0d0'} lineWidth={3} opacity={0} scale={0.08} zIndex={2} />
 
       <Node ref={positionGuides} opacity={0}>
         <Line ref={positionXAxis} points={[[-600, 170], [600, 170]]} stroke={'#777777'} lineWidth={6} lineCap={'round'} endArrow arrowSize={18} end={0} />
@@ -145,11 +144,11 @@ export default makeScene2D(function* (view) {
   yield* all(
     ...byteRefs.flatMap(ref => [
       ref().x(0, 0.45, easeInOutCubic),
-      ref().width(280, 0.45, easeInOutCubic),
-      ref().height(280, 0.45, easeInOutCubic),
-      ref().radius(140, 0.45, easeInOutCubic),
-      ref().fill('#ef5350', 0.45, easeInOutCubic),
-      ref().stroke('#ef5350', 0.45, easeInOutCubic),
+      ref().width(230, 0.45, easeInOutCubic),
+      ref().height(230, 0.45, easeInOutCubic),
+      ref().radius(115, 0.45, easeInOutCubic),
+      ref().fill('#ffffff', 0.45, easeInOutCubic),
+      ref().stroke('#d0d0d0', 0.45, easeInOutCubic),
     ]),
     ...byteTextRefs.map(ref => ref().opacity(0, 0.24, easeOutCubic)),
   );
@@ -157,34 +156,33 @@ export default makeScene2D(function* (view) {
   dataOrb().opacity(1);
   dataOrb().scale(1);
 
-  // 1.72–2.68: sweep continuously across the frame, stamping each color.
-  yield* all(dataOrb().x(-420, 0.18, easeInOutCubic), dataOrb().y(50, 0.18, easeInOutCubic));
-  redStamp().opacity(1);
+  // 1.72–2.17: split the white data object into an RGB triangle.
   yield* all(
-    dataOrb().x(420, 0.66, easeInOutCubic),
-    chain(
-      dataOrb().fill('#66bb6a', 0.33, easeInOutCubic),
-      dataOrb().fill('#42a5f5', 0.33, easeInOutCubic),
-    ),
-    chain(
-      waitFor(0.33),
-      greenStamp().opacity(1, 0),
-    ),
+    dataOrb().opacity(0, 0.18, easeOutCubic),
+    redStamp().opacity(1, 0.12, easeOutCubic),
+    redStamp().position([0, -170], 0.45, easeInOutCubic),
+    redStamp().fill('#ef5350', 0.36, easeInOutCubic),
+    redStamp().scale(1, 0.45, easeOutCubic),
+    greenStamp().opacity(1, 0.12, easeOutCubic),
+    greenStamp().position([-240, 170], 0.45, easeInOutCubic),
+    greenStamp().fill('#66bb6a', 0.36, easeInOutCubic),
+    greenStamp().scale(1, 0.45, easeOutCubic),
+    blueStamp().opacity(1, 0.12, easeOutCubic),
+    blueStamp().position([240, 170], 0.45, easeInOutCubic),
+    blueStamp().fill('#42a5f5', 0.36, easeInOutCubic),
+    blueStamp().scale(1, 0.45, easeOutCubic),
   );
-  blueStamp().opacity(1);
-  yield* waitFor(0.12);
+  yield* waitFor(0.51);
 
   // 2.68–3.13: turn the same object into a point on a coordinate plane.
   positionGuides().opacity(1);
   yield* all(
-    redStamp().opacity(0, 0.20, easeOutCubic),
     greenStamp().opacity(0, 0.20, easeOutCubic),
     blueStamp().opacity(0, 0.20, easeOutCubic),
     positionXAxis().end(1, 0.45, easeInOutCubic),
     positionYAxis().end(1, 0.45, easeInOutCubic),
-    dataOrb().position([300, -100], 0.45, easeInOutCubic),
-    dataOrb().fill('#ef5350', 0.45, easeInOutCubic),
-    dataOrb().scale(0.32, 0.45, easeInOutCubic),
+    redStamp().position([300, -100], 0.45, easeInOutCubic),
+    redStamp().scale(0.32, 0.45, easeInOutCubic),
   );
   yield* waitFor(0.50);
 
@@ -192,10 +190,10 @@ export default makeScene2D(function* (view) {
   yield* all(
     positionGuides().opacity(0, 0.25, easeOutCubic),
     transparencyGrid().opacity(1, 0.45, easeOutCubic),
-    dataOrb().position([0, 40], 0.45, easeInOutCubic),
-    dataOrb().fill('#42a5f5', 0.45, easeInOutCubic),
-    dataOrb().opacity(0.48, 0.45, easeInOutCubic),
-    dataOrb().scale(1.5, 0.45, easeInOutCubic),
+    redStamp().position([0, 40], 0.45, easeInOutCubic),
+    redStamp().fill('#42a5f5', 0.45, easeInOutCubic),
+    redStamp().opacity(0.48, 0.45, easeInOutCubic),
+    redStamp().scale(1.5, 0.45, easeInOutCubic),
   );
 
   // Hold the final transparency state.
