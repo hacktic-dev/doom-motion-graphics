@@ -144,8 +144,10 @@ const treePositions = [
 ];
 
 const DOOM_ZOOM_START = 1.004;
-const DOOM_ZOOM_END = 1.08;
+const DOOM_ZOOM_END = 1.045;
 const DOOM_ZOOM_DURATION = 4.04;
+const DOOM_HOLD_BEFORE_FADE = 2.10;
+const EMPTY_GAP_BEFORE_SUMMARY = 3.00;
 
 export default makeScene2D(function* (view) {
   /*
@@ -218,7 +220,6 @@ export default makeScene2D(function* (view) {
   const doomFrame = createRef<Rect>();
   const doomArtwork = createRef<Img>();
 
-  const polyglotLabel = createRef<Txt>();
 
   const summary = createRef<Node>();
 
@@ -991,24 +992,6 @@ export default makeScene2D(function* (view) {
 
       {/*
        * -------------------------------------------------------
-       * POLYGLOT
-       * -------------------------------------------------------
-       */}
-
-      <Txt
-        ref={polyglotLabel}
-        text={'POLYGLOT'}
-        y={410}
-        fill={'#61509d'}
-        fontSize={47}
-        fontFamily={'Arial'}
-        fontWeight={700}
-        opacity={0}
-        scale={0.9}
-      />
-
-      {/*
-       * -------------------------------------------------------
        * FINAL SUMMARY
        * -------------------------------------------------------
        */}
@@ -1017,65 +1000,65 @@ export default makeScene2D(function* (view) {
         ref={summary}
         opacity={0}
         scale={0.82}
-        y={15}
+        y={10}
         zIndex={9}
       >
-        <Line
-          points={[
-            [-90, -125],
-            [38, -125],
-            [90, -73],
-            [90, 125],
-            [-90, 125],
-          ]}
-          closed
-          fill={'#ffffff'}
-          stroke={'#aaaaaa'}
-          lineWidth={4}
-          radius={14}
-          shadowColor={
-            'rgba(0,0,0,0.17)'
-          }
-          shadowBlur={20}
-          shadowOffsetY={9}
-        />
+        <Node y={-10}>
+          <Line
+            points={[
+              [-90, -125],
+              [38, -125],
+              [90, -73],
+              [90, 125],
+              [-90, 125],
+            ]}
+            closed
+            fill={'#ffffff'}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+            radius={14}
+            shadowColor={'rgba(0,0,0,0.17)'}
+            shadowBlur={20}
+            shadowOffsetY={9}
+          />
+
+          <Line
+            points={[
+              [38, -125],
+              [38, -73],
+              [90, -73],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+          />
+
+          <Line
+            points={[
+              [38, -125],
+              [90, -73],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+          />
+
+          {[-54, -26, 2, 30].map((y, index) => (
+            <Rect
+              key={`summary-line-${index}`}
+              width={index % 2 === 0 ? 104 : 82}
+              height={14}
+              radius={7}
+              x={-8}
+              y={y}
+              fill={index < 2 ? '#b7b7b7' : '#8874bd'}
+              opacity={index < 2 ? 1 : 0.92}
+            />
+          ))}
+        </Node>
 
         <Line
           points={[
-            [38, -125],
-            [38, -73],
-            [90, -73],
-          ]}
-          stroke={'#aaaaaa'}
-          lineWidth={4}
-        />
-
-        <Line
-          points={[
-            [38, -125],
-            [90, -73],
-          ]}
-          stroke={'#aaaaaa'}
-          lineWidth={4}
-        />
-
-        <Txt
-          text={
-            '89 50 4E\n47 0D 0A'
-          }
-          fill={'#777777'}
-          fontSize={20}
-          fontFamily={'monospace'}
-          fontWeight={700}
-          lineHeight={33}
-          opacity={0.55}
-          y={8}
-        />
-
-        <Line
-          points={[
-            [-90, 15],
-            [-205, 15],
+            [-92, -10],
+            [-250, -10],
           ]}
           stroke={'#777777'}
           lineWidth={4}
@@ -1084,70 +1067,131 @@ export default makeScene2D(function* (view) {
 
         <Line
           points={[
-            [90, 15],
-            [205, 15],
+            [92, -10],
+            [250, -10],
           ]}
           stroke={'#777777'}
           lineWidth={4}
           lineCap={'round'}
         />
 
-        <Rect
-          x={-290}
-          y={15}
-          width={155}
-          height={76}
-          radius={14}
-          fill={'#d4f0d5'}
-          stroke={'#4d8d57'}
-          lineWidth={3}
-          shadowColor={
-            'rgba(0,0,0,0.12)'
-          }
-          shadowBlur={10}
-          shadowOffsetY={4}
-        >
-          <Txt
-            text={'PNG'}
-            fill={'#377b42'}
-            fontSize={35}
-            fontFamily={'Arial'}
-            fontWeight={700}
+        <Node x={-345} y={-10} scale={1.05}>
+          <Line
+            points={[
+              [-76, -92],
+              [30, -92],
+              [76, -46],
+              [76, 92],
+              [-76, 92],
+            ]}
+            closed
+            fill={'#ffffff'}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+            radius={12}
+            shadowColor={'rgba(0,0,0,0.14)'}
+            shadowBlur={14}
+            shadowOffsetY={6}
           />
-        </Rect>
 
-        <Rect
-          x={290}
-          y={15}
-          width={155}
-          height={76}
-          radius={14}
-          fill={'#dcd6f2'}
-          stroke={'#66539e'}
-          lineWidth={3}
-          shadowColor={
-            'rgba(0,0,0,0.12)'
-          }
-          shadowBlur={10}
-          shadowOffsetY={4}
-        >
-          <Txt
-            text={'HTML'}
-            fill={'#59458f'}
-            fontSize={32}
-            fontFamily={'Arial'}
-            fontWeight={700}
+          <Line
+            points={[
+              [30, -92],
+              [30, -46],
+              [76, -46],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
           />
-        </Rect>
 
-        <Txt
-          text={'POLYGLOT'}
-          fill={'#2f2f2f'}
-          fontSize={38}
-          fontFamily={'Arial'}
-          fontWeight={700}
-          y={190}
-        />
+          <Line
+            points={[
+              [30, -92],
+              [76, -46],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+          />
+
+          <Node y={12} scale={0.9}>
+            <PngPreview />
+          </Node>
+        </Node>
+
+        <Node x={345} y={-10} scale={1.05}>
+          <Line
+            points={[
+              [-76, -92],
+              [30, -92],
+              [76, -46],
+              [76, 92],
+              [-76, 92],
+            ]}
+            closed
+            fill={'#ffffff'}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+            radius={12}
+            shadowColor={'rgba(0,0,0,0.14)'}
+            shadowBlur={14}
+            shadowOffsetY={6}
+          />
+
+          <Line
+            points={[
+              [30, -92],
+              [30, -46],
+              [76, -46],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+          />
+
+          <Line
+            points={[
+              [30, -92],
+              [76, -46],
+            ]}
+            stroke={'#aaaaaa'}
+            lineWidth={4}
+          />
+
+          <Node y={2}>
+            <Line
+              points={[
+                [-28, -8],
+                [-48, 11],
+                [-28, 30],
+              ]}
+              stroke={'#565656'}
+              lineWidth={9}
+              lineCap={'round'}
+              lineJoin={'round'}
+            />
+
+            <Line
+              points={[
+                [8, -8],
+                [-8, 30],
+              ]}
+              stroke={'#565656'}
+              lineWidth={9}
+              lineCap={'round'}
+            />
+
+            <Line
+              points={[
+                [28, -8],
+                [48, 11],
+                [28, 30],
+              ]}
+              stroke={'#565656'}
+              lineWidth={9}
+              lineCap={'round'}
+              lineJoin={'round'}
+            />
+          </Node>
+        </Node>
       </Node>
     </Node>,
   );
@@ -1891,41 +1935,13 @@ export default makeScene2D(function* (view) {
   );
 
   /*
-   * Hold while the SAME background zoom keeps running.
+   * Hold on Doom while the SAME background zoom keeps running.
    */
-  yield* waitFor(1.00);
+  yield* waitFor(DOOM_HOLD_BEFORE_FADE);
 
   /*
-   * POLYGLOT
-   *
-   * Again, no Doom scale tween here. The original long zoom
-   * is still running in the background.
-   */
-
-  yield* all(
-    polyglotLabel().opacity(
-      1,
-      0.35,
-      easeOutCubic,
-    ),
-
-    polyglotLabel().scale(
-      1,
-      0.45,
-      easeOutCubic,
-    ),
-
-    polyglotLabel().y(
-      392,
-      0.45,
-      easeOutCubic,
-    ),
-  );
-
-  yield* waitFor(1.15);
-
-  /*
-   * FINAL SUMMARY
+   * Fade Doom away completely.
+   * Leave the stage empty so you can animate POLYGLOT in Fusion.
    */
 
   yield* all(
@@ -1958,19 +1974,16 @@ export default makeScene2D(function* (view) {
       0.42,
       easeInCubic,
     ),
+  );
 
-    polyglotLabel().opacity(
-      0,
-      0.40,
-      easeInCubic,
-    ),
+  yield* waitFor(EMPTY_GAP_BEFORE_SUMMARY);
 
-    polyglotLabel().scale(
-      0.82,
-      0.50,
-      easeInCubic,
-    ),
+  /*
+   * Bring in the clean file-format summary graphic.
+   * No POLYGLOT text here.
+   */
 
+  yield* all(
     summary().opacity(
       1,
       0.50,
@@ -1979,6 +1992,12 @@ export default makeScene2D(function* (view) {
 
     summary().scale(
       1,
+      0.75,
+      easeOutCubic,
+    ),
+
+    summary().y(
+      0,
       0.75,
       easeOutCubic,
     ),
