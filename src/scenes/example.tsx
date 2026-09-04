@@ -16,6 +16,44 @@ import {
   easeOutCubic,
 } from '@motion-canvas/core';
 
+function PngPreview(props: {scale?: number}) {
+  const scale = props.scale ?? 1;
+
+  return (
+    <Node scale={scale}>
+      <Rect
+        width={105}
+        height={85}
+        radius={8}
+        fill={'#d8ecff'}
+        clip
+      >
+        <Circle
+          width={20}
+          height={20}
+          fill={'#ffd54a'}
+          x={28}
+          y={-22}
+        />
+
+        <Line
+          points={[
+            [-55, 40],
+            [-18, 0],
+            [5, 24],
+            [28, -5],
+            [55, 40],
+          ]}
+          closed
+          fill={'#62a66f'}
+          stroke={'#62a66f'}
+          lineWidth={2}
+        />
+      </Rect>
+    </Node>
+  );
+}
+
 export default makeScene2D(function* (view) {
   const root = createRef<Node>();
 
@@ -35,9 +73,8 @@ export default makeScene2D(function* (view) {
   const editorWindow = createRef<Node>();
 
   const rawBytes = ['89', '50', '4E', '47', '0D', '0A', '1A', '0A'];
-  const byteRefs = rawBytes.map(() => createRef<Rect>());
 
-  const HOLD_BEFORE_TRANSFORM = 174 / 60; // 20:14 -> 23:08 at 60fps = 2.9s
+  const HOLD_BEFORE_TRANSFORM = 174 / 60; // 20:14 -> 23:08 at 60 fps
   const COLLAPSE_DURATION = 0.50;
   const WINDOW_REVEAL_DURATION = 0.40;
   const LEFT_FOCUS_HOLD = 0.60;
@@ -46,14 +83,22 @@ export default makeScene2D(function* (view) {
   const RESTORE_DURATION = 0.30;
   const FINAL_HOLD = 0.60;
 
+  const FINAL_BYTES_Y = -155;
+
+  const WINDOW_X = 300;
+  const WINDOW_Y = 205;
+  const WINDOW_WIDTH = 500;
+  const WINDOW_HEIGHT = 340;
+  const TITLEBAR_HEIGHT = 42;
+
   const FOCUSED_SCALE = 1.03;
-  const DIMMED_SCALE = 0.94;
+  const DIMMED_SCALE = 0.92;
   const FOCUSED_OPACITY = 1.0;
-  const DIMMED_OPACITY = 0.38;
+  const DIMMED_OPACITY = 0.35;
 
   view.add(
     <Node ref={root} scale={1.25}>
-      {/* FILE ICON — starts already in the "end of previous shot" position */}
+      {/* FILE ICON — starts already in the end state of the previous shot */}
       <Node ref={file} y={-200} opacity={1} scale={1}>
         <Node y={-35}>
           <Line
@@ -90,36 +135,9 @@ export default makeScene2D(function* (view) {
             lineWidth={4}
           />
 
-          <Rect
-            width={105}
-            height={85}
-            radius={8}
-            fill={'#d8ecff'}
-            y={20}
-            clip
-          >
-            <Circle
-              width={20}
-              height={20}
-              fill={'#ffd54a'}
-              x={28}
-              y={-22}
-            />
-
-            <Line
-              points={[
-                [-55, 40],
-                [-18, 0],
-                [5, 24],
-                [28, -5],
-                [55, 40],
-              ]}
-              closed
-              fill={'#62a66f'}
-              stroke={'#62a66f'}
-              lineWidth={2}
-            />
-          </Rect>
+          <Node y={20}>
+            <PngPreview />
+          </Node>
         </Node>
 
         <Txt
@@ -132,7 +150,7 @@ export default makeScene2D(function* (view) {
         />
       </Node>
 
-      {/* CONNECTOR — fully drawn at scene start */}
+      {/* CONNECTOR — visible at scene start */}
       <Line
         ref={connector}
         points={[
@@ -146,11 +164,10 @@ export default makeScene2D(function* (view) {
         opacity={1}
       />
 
-      {/* BYTES — start in previous shot position */}
+      {/* BYTES — visible at scene start */}
       <Node ref={bytes} y={85} opacity={1} scale={1}>
         {rawBytes.map((byte, index) => (
           <Rect
-            ref={byteRefs[index]}
             key={index}
             width={125}
             height={100}
@@ -173,13 +190,12 @@ export default makeScene2D(function* (view) {
         ))}
       </Node>
 
-      {/* ARROWS — hidden initially */}
+      {/* STRAIGHT VERTICAL ARROWS */}
       <Line
         ref={leftArrow}
         points={[
-          [-110, -55],
-          [-110, 0],
-          [-280, 105],
+          [-WINDOW_X, -92],
+          [-WINDOW_X, 8],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -191,9 +207,8 @@ export default makeScene2D(function* (view) {
       <Line
         ref={rightArrow}
         points={[
-          [110, -55],
-          [110, 0],
-          [280, 105],
+          [WINDOW_X, -92],
+          [WINDOW_X, 8],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -205,8 +220,8 @@ export default makeScene2D(function* (view) {
       <Line
         ref={leftArrowHeadA}
         points={[
-          [-280, 105],
-          [-260, 88],
+          [-WINDOW_X, 8],
+          [-WINDOW_X - 14, -10],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -216,8 +231,8 @@ export default makeScene2D(function* (view) {
       <Line
         ref={leftArrowHeadB}
         points={[
-          [-280, 105],
-          [-276, 80],
+          [-WINDOW_X, 8],
+          [-WINDOW_X + 14, -10],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -228,8 +243,8 @@ export default makeScene2D(function* (view) {
       <Line
         ref={rightArrowHeadA}
         points={[
-          [280, 105],
-          [260, 88],
+          [WINDOW_X, 8],
+          [WINDOW_X - 14, -10],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -239,8 +254,8 @@ export default makeScene2D(function* (view) {
       <Line
         ref={rightArrowHeadB}
         points={[
-          [280, 105],
-          [276, 80],
+          [WINDOW_X, 8],
+          [WINDOW_X + 14, -10],
         ]}
         stroke={'#333333'}
         lineWidth={5}
@@ -251,94 +266,72 @@ export default makeScene2D(function* (view) {
       {/* IMAGE VIEWER WINDOW */}
       <Node
         ref={viewerWindow}
-        x={-290}
-        y={250}
+        x={-WINDOW_X}
+        y={WINDOW_Y}
         opacity={0}
-        scale={0.90}
+        scale={0.88}
       >
         <Rect
-          width={250}
-          height={155}
-          radius={12}
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
+          radius={16}
           fill={'#f2f2f2'}
           stroke={'#2f2f2f'}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.20)'}
-          shadowBlur={18}
-          shadowOffsetY={8}
+          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowBlur={22}
+          shadowOffsetY={10}
           clip
         >
           <Rect
-            width={250}
-            height={34}
-            y={-60.5}
+            width={WINDOW_WIDTH}
+            height={TITLEBAR_HEIGHT}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
             fill={'#2f3238'}
           />
 
-          <Circle width={12} height={12} x={-103} y={-60.5} fill={'#ff5f57'} />
-          <Circle width={12} height={12} x={-83} y={-60.5} fill={'#febc2e'} />
-          <Circle width={12} height={12} x={-63} y={-60.5} fill={'#28c840'} />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 26}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#ff5f57'}
+          />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 48}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#febc2e'}
+          />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 70}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#28c840'}
+          />
 
           <Txt
             text={'Image Viewer'}
-            y={-60.5}
-            fontSize={20}
+            x={58}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
             fill={'#ffffff'}
           />
 
           <Rect
-            width={160}
-            height={86}
-            y={18}
+            width={300}
+            height={200}
+            y={30}
             fill={'#ffffff'}
-            stroke={'#cfcfcf'}
+            stroke={'#d7d7d7'}
             lineWidth={2}
             clip
           >
-            <Rect
-              width={144}
-              height={70}
-              y={0}
-              fill={'#93c5fd'}
-            />
-
-            <Circle
-              width={16}
-              height={16}
-              fill={'#ffffff'}
-              x={48}
-              y={-20}
-            />
-
-            <Line
-              points={[
-                [-72, 28],
-                [-38, -4],
-                [-10, 20],
-                [18, -8],
-                [72, 28],
-              ]}
-              closed
-              fill={'#718096'}
-              stroke={'#718096'}
-              lineWidth={2}
-            />
-
-            <Line
-              points={[
-                [-72, 30],
-                [-48, 10],
-                [-20, 28],
-                [8, 8],
-                [72, 30],
-              ]}
-              closed
-              fill={'#5ca764'}
-              stroke={'#5ca764'}
-              lineWidth={2}
-            />
+            <PngPreview scale={2.4} />
           </Rect>
         </Rect>
       </Node>
@@ -346,38 +339,57 @@ export default makeScene2D(function* (view) {
       {/* TEXT EDITOR WINDOW */}
       <Node
         ref={editorWindow}
-        x={290}
-        y={250}
+        x={WINDOW_X}
+        y={WINDOW_Y}
         opacity={0}
-        scale={0.90}
+        scale={0.88}
       >
         <Rect
-          width={250}
-          height={155}
-          radius={12}
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
+          radius={16}
           fill={'#f2f2f2'}
           stroke={'#2f2f2f'}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.20)'}
-          shadowBlur={18}
-          shadowOffsetY={8}
+          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowBlur={22}
+          shadowOffsetY={10}
           clip
         >
           <Rect
-            width={250}
-            height={34}
-            y={-60.5}
+            width={WINDOW_WIDTH}
+            height={TITLEBAR_HEIGHT}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
             fill={'#2f3238'}
           />
 
-          <Circle width={12} height={12} x={-103} y={-60.5} fill={'#ff5f57'} />
-          <Circle width={12} height={12} x={-83} y={-60.5} fill={'#febc2e'} />
-          <Circle width={12} height={12} x={-63} y={-60.5} fill={'#28c840'} />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 26}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#ff5f57'}
+          />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 48}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#febc2e'}
+          />
+          <Circle
+            width={13}
+            height={13}
+            x={-(WINDOW_WIDTH / 2) + 70}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fill={'#28c840'}
+          />
 
           <Txt
             text={'Text Editor'}
-            y={-60.5}
-            fontSize={20}
+            x={52}
+            y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
             fill={'#ffffff'}
@@ -385,10 +397,10 @@ export default makeScene2D(function* (view) {
 
           <Txt
             text={'%PNG....IHDR…'}
-            x={-40}
-            y={-12}
-            width={170}
-            fontSize={28}
+            x={18}
+            y={-36}
+            width={340}
+            fontSize={34}
             fontFamily={'monospace'}
             fill={'#111111'}
             textAlign={'left'}
@@ -396,10 +408,10 @@ export default makeScene2D(function* (view) {
 
           <Txt
             text={'ÿØ...'}
-            x={-74}
-            y={26}
-            width={170}
-            fontSize={32}
+            x={-16}
+            y={18}
+            width={340}
+            fontSize={38}
             fontFamily={'monospace'}
             fill={'#111111'}
             textAlign={'left'}
@@ -409,26 +421,19 @@ export default makeScene2D(function* (view) {
     </Node>
   );
 
-  // Start state for the next clip:
-  // file visible at top, connector visible, bytes visible underneath.
-
-  // Hold until 23:08 relative to the 20:14 clip start.
+  // Hold until the transformation point
   yield* waitFor(HOLD_BEFORE_TRANSFORM);
 
-  // Over about half a second:
-  // - file disappears
-  // - connector disappears
-  // - bytes move up to where the file area was
+  // File disappears, connector disappears, bytes move upward
   yield* all(
     file().opacity(0, COLLAPSE_DURATION, easeOutCubic),
     file().scale(0.92, COLLAPSE_DURATION, easeOutCubic),
     connector().opacity(0, COLLAPSE_DURATION * 0.65, easeOutCubic),
-    bytes().y(-112, COLLAPSE_DURATION, easeInOutCubic),
-    bytes().scale(0.96, COLLAPSE_DURATION, easeInOutCubic),
+    bytes().y(FINAL_BYTES_Y, COLLAPSE_DURATION, easeInOutCubic),
   );
 
   // Draw arrows and reveal windows.
-  // Left window is highlighted first; right is dimmed and slightly smaller.
+  // Image viewer starts focused, text editor starts dimmed.
   yield* all(
     leftArrow().opacity(1, 0),
     rightArrow().opacity(1, 0),
@@ -453,10 +458,10 @@ export default makeScene2D(function* (view) {
     editorWindow().scale(DIMMED_SCALE, WINDOW_REVEAL_DURATION, easeOutCubic),
   );
 
-  // Hold on left focus.
+  // Hold on image viewer focus
   yield* waitFor(LEFT_FOCUS_HOLD);
 
-  // Swap focus to the text editor.
+  // Swap focus to text editor
   yield* all(
     viewerWindow().opacity(DIMMED_OPACITY, SWAP_DURATION, easeInOutCubic),
     viewerWindow().scale(DIMMED_SCALE, SWAP_DURATION, easeInOutCubic),
@@ -465,10 +470,10 @@ export default makeScene2D(function* (view) {
     editorWindow().scale(FOCUSED_SCALE, SWAP_DURATION, easeInOutCubic),
   );
 
-  // Hold on right focus.
+  // Hold on text editor focus
   yield* waitFor(RIGHT_FOCUS_HOLD);
 
-  // Return both to normal.
+  // Return both to normal
   yield* all(
     viewerWindow().opacity(1, RESTORE_DURATION, easeInOutCubic),
     viewerWindow().scale(1, RESTORE_DURATION, easeInOutCubic),
