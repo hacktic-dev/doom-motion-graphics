@@ -75,6 +75,7 @@ export default makeScene2D(function* (view) {
   const STEM_DRAW_DURATION = 0.16;
   const BRANCH_DRAW_DURATION = 0.38;
   const WINDOW_REVEAL_DURATION = 0.40;
+  const NEUTRAL_WINDOW_HOLD = 0.30;
   const LEFT_FOCUS_HOLD = 0.60;
   const SWAP_DURATION = 0.35;
   const RIGHT_FOCUS_HOLD = 0.60;
@@ -400,14 +401,25 @@ export default makeScene2D(function* (view) {
     rightArrow().end(1, BRANCH_DRAW_DURATION, easeInOutCubic),
   );
 
-  // Reveal the windows only after the split-arrow drawing is complete.
-  // Image viewer starts focused, text editor starts dimmed.
+  // Reveal both windows at their normal size and full opacity.
   yield* all(
-    viewerWindow().opacity(FOCUSED_OPACITY, WINDOW_REVEAL_DURATION * 0.8, easeOutCubic),
-    viewerWindow().scale(FOCUSED_SCALE, WINDOW_REVEAL_DURATION, easeOutCubic),
+    viewerWindow().opacity(1, WINDOW_REVEAL_DURATION * 0.8, easeOutCubic),
+    viewerWindow().scale(1, WINDOW_REVEAL_DURATION, easeOutCubic),
 
-    editorWindow().opacity(DIMMED_OPACITY, WINDOW_REVEAL_DURATION * 0.8, easeOutCubic),
-    editorWindow().scale(DIMMED_SCALE, WINDOW_REVEAL_DURATION, easeOutCubic),
+    editorWindow().opacity(1, WINDOW_REVEAL_DURATION * 0.8, easeOutCubic),
+    editorWindow().scale(1, WINDOW_REVEAL_DURATION, easeOutCubic),
+  );
+
+  // Briefly hold the neutral state before emphasizing either window.
+  yield* waitFor(NEUTRAL_WINDOW_HOLD);
+
+  // Focus the image viewer and dim the text editor.
+  yield* all(
+    viewerWindow().opacity(FOCUSED_OPACITY, SWAP_DURATION, easeInOutCubic),
+    viewerWindow().scale(FOCUSED_SCALE, SWAP_DURATION, easeInOutCubic),
+
+    editorWindow().opacity(DIMMED_OPACITY, SWAP_DURATION, easeInOutCubic),
+    editorWindow().scale(DIMMED_SCALE, SWAP_DURATION, easeInOutCubic),
   );
 
   // Hold on image viewer focus
