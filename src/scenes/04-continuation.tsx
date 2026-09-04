@@ -1,5 +1,6 @@
 import {
   Circle,
+  Img,
   Line,
   Node,
   Path,
@@ -15,11 +16,13 @@ import {
   easeInCubic,
   easeInOutCubic,
   easeOutCubic,
+  linear,
   sequence,
   waitFor,
 } from '@motion-canvas/core';
 
 import {PngPreview} from '../components/PngPreview';
+import doomImage from '../img/Doom.png';
 
 const openingBytes = ['89', '50', '4E', '47'];
 const openingGlyphs = ['‰', 'P', 'N', 'G'];
@@ -72,14 +75,77 @@ const insertedLineY = [
   42,
 ];
 
+/*
+ * Window.
+ */
+const WINDOW_WIDTH = 1160;
+
+/*
+ * 720 image height
+ * + 58 title bar
+ * + 32px above image
+ * + 32px below image
+ */
+const WINDOW_HEIGHT = 842;
+const TITLEBAR_HEIGHT = 58;
+const CONTENT_MARGIN = 32;
+
+/*
+ * Preserve the exact old landscape height.
+ */
+const LANDSCAPE_BASE_SIZE = 720;
+
+const CONTENT_WIDTH =
+  WINDOW_WIDTH -
+  CONTENT_MARGIN * 2;
+
+const CONTENT_HEIGHT =
+  LANDSCAPE_BASE_SIZE;
+
+const CONTENT_Y =
+  -WINDOW_HEIGHT / 2 +
+  TITLEBAR_HEIGHT +
+  CONTENT_MARGIN +
+  CONTENT_HEIGHT / 2;
+
+/*
+ * THIS is the important part.
+ *
+ * Old landscape:
+ * 720 × 720
+ *
+ * New viewport:
+ * 1096 × 720
+ *
+ * We retain all the old coordinates and simply
+ * expand them horizontally.
+ */
+const LANDSCAPE_X_SCALE =
+  CONTENT_WIDTH /
+  LANDSCAPE_BASE_SIZE;
+
+const LANDSCAPE_X_INVERSE =
+  1 / LANDSCAPE_X_SCALE;
+
+/*
+ * These are the SAME tree positions from the
+ * landscape version you liked.
+ */
 const treePositions = [
-  [-250, 130],
-  [-170, 148],
-  [-110, 126],
-  [115, 128],
-  [180, 112],
-  [250, 145],
+  [-304, 148],
+  [-252, 128],
+  [-195, 161],
+  [-142, 145],
+
+  [155, 148],
+  [212, 124],
+  [270, 156],
+  [318, 132],
 ];
+
+const DOOM_ZOOM_START = 1.004;
+const DOOM_ZOOM_END = 1.08;
+const DOOM_ZOOM_DURATION = 4.04;
 
 export default makeScene2D(function* (view) {
   /*
@@ -90,10 +156,6 @@ export default makeScene2D(function* (view) {
 
   const openingNodeRefs = openingBytes.map(
     () => createRef<Node>(),
-  );
-
-  const openingRectRefs = openingBytes.map(
-    () => createRef<Rect>(),
   );
 
   const openingByteRefs = openingBytes.map(
@@ -118,42 +180,43 @@ export default makeScene2D(function* (view) {
 
   const cursor = createRef<Node>();
 
-  /*
-   * Click ripple.
-   */
   const clickRingA = createRef<Circle>();
   const clickRingB = createRef<Circle>();
 
   const programWindow = createRef<Node>();
   const programTitle = createRef<Txt>();
 
+  /*
+   * Landscape.
+   */
+
   const landscape = createRef<Node>();
 
   const sky = createRef<Rect>();
+
   const sun = createRef<Circle>();
+
+  const cloudA = createRef<Node>();
+  const cloudB = createRef<Node>();
 
   const farMountains = createRef<Line>();
   const nearMountains = createRef<Line>();
 
-  const river = createRef<Line>();
+  const lake = createRef<Rect>();
 
-  const leftLand = createRef<Line>();
-  const rightLand = createRef<Line>();
+  const leftShore = createRef<Line>();
+  const rightShore = createRef<Line>();
 
   const treeRefs = treePositions.map(
-    () => createRef<Line>(),
+    () => createRef<Node>(),
   );
 
-  const doomScene = createRef<Node>();
+  /*
+   * Doom artwork.
+   */
 
-  const doomFloor = createRef<Line>();
-  const doomLeftWall = createRef<Line>();
-  const doomRightWall = createRef<Line>();
-  const doomDoor = createRef<Rect>();
-
-  const doomEnemy = createRef<Node>();
-  const doomHud = createRef<Node>();
-  const doomGun = createRef<Line>();
+  const doomFrame = createRef<Rect>();
+  const doomArtwork = createRef<Img>();
 
   const polyglotLabel = createRef<Txt>();
 
@@ -169,7 +232,7 @@ export default makeScene2D(function* (view) {
     <Node scale={1.25}>
       {/*
        * -------------------------------------------------------
-       * EXACT SCENE 3 ENDING
+       * SCENE 3 ENDING
        * -------------------------------------------------------
        */}
 
@@ -183,7 +246,6 @@ export default makeScene2D(function* (view) {
             zIndex={6}
           >
             <Rect
-              ref={openingRectRefs[index]}
               width={205}
               height={170}
               radius={24}
@@ -251,8 +313,13 @@ export default makeScene2D(function* (view) {
               width={width}
               height={17}
               radius={8.5}
-              x={DATA_LEFT + width / 2}
-              y={dataLineInitialY[index]}
+              x={
+                DATA_LEFT +
+                width / 2
+              }
+              y={
+                dataLineInitialY[index]
+              }
               fill={'#b7b7b7'}
             />
           ),
@@ -261,7 +328,9 @@ export default makeScene2D(function* (view) {
         {insertedLineWidths.map(
           (width, index) => (
             <Rect
-              ref={insertedLineRefs[index]}
+              ref={
+                insertedLineRefs[index]
+              }
               key={`inserted-line-${index}`}
               width={width}
               height={17}
@@ -271,11 +340,15 @@ export default makeScene2D(function* (view) {
                 width / 2 -
                 180
               }
-              y={insertedLineY[index]}
+              y={
+                insertedLineY[index]
+              }
               fill={'#8874bd'}
               opacity={0}
               scale={[0.65, 1]}
-              shadowColor={'rgba(95,72,150,0.16)'}
+              shadowColor={
+                'rgba(95,72,150,0.16)'
+              }
               shadowBlur={7}
             />
           ),
@@ -309,7 +382,9 @@ export default makeScene2D(function* (view) {
             stroke={'#c8c8c8'}
             lineWidth={4}
             radius={12}
-            shadowColor={'rgba(0,0,0,0.18)'}
+            shadowColor={
+              'rgba(0,0,0,0.18)'
+            }
             shadowBlur={18}
             shadowOffsetY={8}
           />
@@ -350,9 +425,7 @@ export default makeScene2D(function* (view) {
 
       {/*
        * -------------------------------------------------------
-       * CLICK RINGS
-       *
-       * Positioned at the final cursor-tip location.
+       * CLICK RIPPLE
        * -------------------------------------------------------
        */}
 
@@ -362,7 +435,9 @@ export default makeScene2D(function* (view) {
         y={-10}
         width={18}
         height={18}
-        stroke={'rgba(70,70,70,0.55)'}
+        stroke={
+          'rgba(70,70,70,0.55)'
+        }
         lineWidth={3}
         fill={'rgba(0,0,0,0)'}
         opacity={0}
@@ -376,7 +451,9 @@ export default makeScene2D(function* (view) {
         y={-10}
         width={18}
         height={18}
-        stroke={'rgba(70,70,70,0.32)'}
+        stroke={
+          'rgba(70,70,70,0.32)'
+        }
         lineWidth={3}
         fill={'rgba(0,0,0,0)'}
         opacity={0}
@@ -386,7 +463,7 @@ export default makeScene2D(function* (view) {
 
       {/*
        * -------------------------------------------------------
-       * CLEAN MOUSE CURSOR
+       * CURSOR
        * -------------------------------------------------------
        */}
 
@@ -413,7 +490,9 @@ export default makeScene2D(function* (view) {
           stroke={'#202020'}
           lineWidth={2.8}
           lineJoin={'round'}
-          shadowColor={'rgba(0,0,0,0.20)'}
+          shadowColor={
+            'rgba(0,0,0,0.20)'
+          }
           shadowBlur={7}
           shadowOffsetX={2}
           shadowOffsetY={3}
@@ -422,225 +501,449 @@ export default makeScene2D(function* (view) {
 
       {/*
        * -------------------------------------------------------
-       * LARGE CENTRED PROGRAM WINDOW
+       * LARGE PROGRAM WINDOW
        * -------------------------------------------------------
        */}
 
       <Node
         ref={programWindow}
+        x={0}
         y={0}
         opacity={0}
         scale={0.82}
         zIndex={4}
       >
         <Rect
-          width={1160}
-          height={800}
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
           radius={18}
           fill={'#f2f2f2'}
           stroke={'#2f2f2f'}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowColor={
+            'rgba(0,0,0,0.22)'
+          }
           shadowBlur={24}
           shadowOffsetY={11}
           clip
         >
+          {/*
+           * TITLE BAR
+           */}
+
           <Rect
-            width={1160}
-            height={56}
-            y={-372}
+            width={WINDOW_WIDTH}
+            height={TITLEBAR_HEIGHT}
+            y={
+              -WINDOW_HEIGHT / 2 +
+              TITLEBAR_HEIGHT / 2
+            }
             fill={'#2f3238'}
           />
 
           <Circle
             width={15}
             height={15}
-            x={-548}
-            y={-372}
+            x={
+              -WINDOW_WIDTH / 2 +
+              32
+            }
+            y={
+              -WINDOW_HEIGHT / 2 +
+              TITLEBAR_HEIGHT / 2
+            }
             fill={'#ff5f57'}
           />
 
           <Circle
             width={15}
             height={15}
-            x={-522}
-            y={-372}
+            x={
+              -WINDOW_WIDTH / 2 +
+              58
+            }
+            y={
+              -WINDOW_HEIGHT / 2 +
+              TITLEBAR_HEIGHT / 2
+            }
             fill={'#febc2e'}
           />
 
           <Circle
             width={15}
             height={15}
-            x={-496}
-            y={-372}
+            x={
+              -WINDOW_WIDTH / 2 +
+              84
+            }
+            y={
+              -WINDOW_HEIGHT / 2 +
+              TITLEBAR_HEIGHT / 2
+            }
             fill={'#28c840'}
           />
 
           <Txt
-            ref={programTitle}
-            text={'Image Viewer'}
-            x={-430}
-            y={-372}
-            width={290}
-            fontSize={30}
-            fontFamily={'Arial'}
-            fontWeight={600}
-            fill={'#ffffff'}
-            textAlign={'left'}
-          />
+  ref={programTitle}
+  text={'Image Viewer'}
+  x={-289}
+  y={
+    -WINDOW_HEIGHT / 2 +
+    TITLEBAR_HEIGHT / 2
+  }
+  width={350}
+  fontSize={28}
+  fontFamily={'Arial'}
+  fontWeight={600}
+  fill={'#ffffff'}
+  textAlign={'left'}
+/>
 
           {/*
-           * SQUARE IMAGE / GAME AREA
+           * ---------------------------------------------------
+           * WIDE IMAGE VIEWPORT
+           *
+           * 32px from left.
+           * 32px from right.
+           * 32px below title bar.
+           * 32px above bottom.
+           * ---------------------------------------------------
            */}
 
           <Rect
-            width={680}
-            height={680}
-            radius={16}
-            y={38}
-            fill={'#ffffff'}
+            width={CONTENT_WIDTH}
+            height={CONTENT_HEIGHT}
+            radius={14}
+            y={CONTENT_Y}
+            fill={'#dceefa'}
             stroke={'#d1d1d1'}
             lineWidth={3}
-            shadowColor={'rgba(0,0,0,0.08)'}
+            shadowColor={
+              'rgba(0,0,0,0.08)'
+            }
             shadowBlur={10}
             shadowOffsetY={4}
             clip
           >
             {/*
              * ================================================
-             * IMAGE VIEWER
+             * LANDSCAPE
+             *
+             * ALL THE MAIN GEOMETRY BELOW IS THE OLD 720x720
+             * VERSION.
+             *
+             * We expand the parent horizontally.
              * ================================================
              */}
 
-            <Node ref={landscape}>
+            <Node
+              ref={landscape}
+              scale={[
+                LANDSCAPE_X_SCALE,
+                1,
+              ]}
+            >
               <Rect
                 ref={sky}
-                width={680}
-                height={680}
-                fill={'#d7e8f5'}
+                width={720}
+                height={720}
+                fill={'#dceefa'}
                 opacity={0}
               />
 
-              <Circle
-                ref={sun}
-                x={220}
+              {/*
+               * SUN
+               *
+               * Counter-scale X so the circle stays circular.
+               * Its POSITION still gets spread horizontally
+               * by the landscape parent.
+               */}
+
+              <Node
+                x={238}
+                y={-235}
+                scale={[
+                  LANDSCAPE_X_INVERSE,
+                  1,
+                ]}
+              >
+                <Circle
+                  ref={sun}
+                  width={92}
+                  height={92}
+                  fill={'#f2ca59'}
+                  opacity={0}
+                  scale={0.2}
+                />
+              </Node>
+
+              {/*
+               * CLOUD LEFT
+               */}
+
+              <Node
+                ref={cloudA}
+                x={-220}
                 y={-220}
-                width={92}
-                height={92}
-                fill={'#f0c85a'}
                 opacity={0}
-                scale={0.15}
-              />
+                scale={[
+                  LANDSCAPE_X_INVERSE,
+                  1,
+                ]}
+              >
+                <Circle
+                  width={58}
+                  height={38}
+                  x={-30}
+                  fill={'#ffffff'}
+                />
+
+                <Circle
+                  width={72}
+                  height={54}
+                  x={5}
+                  y={-7}
+                  fill={'#ffffff'}
+                />
+
+                <Circle
+                  width={50}
+                  height={34}
+                  x={42}
+                  y={3}
+                  fill={'#ffffff'}
+                />
+
+                <Rect
+                  width={115}
+                  height={25}
+                  y={8}
+                  radius={13}
+                  fill={'#ffffff'}
+                />
+              </Node>
+
+              {/*
+               * CLOUD RIGHT
+               */}
+
+              <Node
+                ref={cloudB}
+                x={110}
+                y={-175}
+                opacity={0}
+                scale={[
+                  LANDSCAPE_X_INVERSE,
+                  1,
+                ]}
+              >
+                <Circle
+                  width={44}
+                  height={30}
+                  x={-22}
+                  fill={'#ffffff'}
+                />
+
+                <Circle
+                  width={58}
+                  height={44}
+                  x={8}
+                  y={-6}
+                  fill={'#ffffff'}
+                />
+
+                <Circle
+                  width={40}
+                  height={28}
+                  x={37}
+                  y={3}
+                  fill={'#ffffff'}
+                />
+
+                <Rect
+                  width={92}
+                  height={21}
+                  y={7}
+                  radius={11}
+                  fill={'#ffffff'}
+                />
+              </Node>
+
+              {/*
+               * EXACT OLD FAR MOUNTAINS
+               */}
 
               <Line
                 ref={farMountains}
                 points={[
-                  [-340, 170],
-                  [-270, 120],
-                  [-200, 150],
-                  [-120, 90],
-                  [-40, 145],
-                  [40, 105],
-                  [120, 152],
-                  [200, 96],
-                  [280, 155],
-                  [340, 118],
-                  [340, 210],
-                  [-340, 210],
+                  [-360, 108],
+                  [-310, 58],
+                  [-266, 88],
+                  [-205, 14],
+                  [-145, 83],
+                  [-90, 38],
+                  [-30, 102],
+                  [35, 51],
+                  [96, 100],
+                  [161, 18],
+                  [224, 91],
+                  [280, 48],
+                  [330, 95],
+                  [360, 70],
+
+                  [360, 144],
+                  [-360, 144],
                 ]}
                 closed
-                fill={'#7a9fc9'}
+                fill={'#7f9fc2'}
                 opacity={0}
-                y={-22}
+                y={35}
               />
+
+              {/*
+               * EXACT OLD NEAR MOUNTAINS
+               */}
 
               <Line
                 ref={nearMountains}
                 points={[
-                  [-340, 200],
-                  [-255, 132],
-                  [-175, 188],
-                  [-85, 110],
-                  [0, 182],
-                  [90, 122],
-                  [180, 196],
-                  [270, 135],
-                  [340, 188],
-                  [340, 235],
-                  [-340, 235],
+                  [-360, 150],
+                  [-300, 91],
+                  [-250, 132],
+                  [-185, 54],
+                  [-118, 137],
+                  [-48, 74],
+                  [16, 145],
+                  [87, 79],
+                  [148, 136],
+                  [218, 65],
+                  [282, 140],
+                  [330, 105],
+                  [360, 127],
+
+                  [360, 179],
+                  [-360, 179],
                 ]}
                 closed
                 fill={'#456f98'}
                 opacity={0}
-                y={-10}
+                y={40}
               />
 
-              <Line
-                ref={leftLand}
-                points={[
-                  [-340, 86],
-                  [-210, 50],
-                  [-75, 78],
-                  [0, 168],
-                  [-340, 215],
-                ]}
-                closed
-                fill={'#5d8b59'}
+              {/*
+               * EXACT OLD LAKE
+               */}
+
+              <Rect
+                ref={lake}
+                width={720}
+                height={250}
+                y={235}
+                fill={'#72b7da'}
                 opacity={0}
-                y={155}
               />
 
-              <Line
-                ref={rightLand}
-                points={[
-                  [340, 74],
-                  [210, 48],
-                  [75, 82],
-                  [0, 168],
-                  [340, 215],
-                ]}
-                closed
-                fill={'#628f5b'}
-                opacity={0}
-                y={155}
-              />
+              {/*
+               * EXACT OLD LEFT SHORE
+               */}
 
               <Line
-                ref={river}
+                ref={leftShore}
                 points={[
-                  [-160, 340],
-                  [-75, 170],
-                  [0, 115],
-                  [75, 170],
-                  [160, 340],
+                  [-360, 131],
+                  [-292, 117],
+                  [-225, 126],
+                  [-162, 149],
+                  [-100, 182],
+                  [-42, 226],
+                  [-92, 360],
+                  [-360, 360],
                 ]}
                 closed
-                fill={'#74b7da'}
+                fill={'#5d8d5a'}
                 opacity={0}
-                scale={[0.15, 1]}
+                y={24}
               />
+
+              {/*
+               * EXACT OLD RIGHT SHORE
+               */}
+
+              <Line
+                ref={rightShore}
+                points={[
+                  [360, 127],
+                  [296, 113],
+                  [231, 125],
+                  [174, 151],
+                  [111, 185],
+                  [44, 225],
+                  [95, 360],
+                  [360, 360],
+                ]}
+                closed
+                fill={'#608f5c'}
+                opacity={0}
+                y={24}
+              />
+
+              {/*
+               * SAME TREES.
+               *
+               * Their positions spread horizontally,
+               * while the inverse X scale keeps each
+               * individual tree looking normal.
+               */}
 
               {treePositions.map(
                 ([x, y], index) => (
-                  <Line
+                  <Node
                     ref={treeRefs[index]}
                     key={`tree-${index}`}
                     x={x}
-                    y={y}
-                    points={[
-                      [0, -44],
-                      [32, 30],
-                      [-32, 30],
-                    ]}
-                    closed
-                    fill={
-                      index % 2 === 0
-                        ? '#2d6758'
-                        : '#3a7865'
-                    }
+                    y={y + 38}
                     opacity={0}
-                    scale={0.2}
-                  />
+                    scale={[
+                      0.25 *
+                        LANDSCAPE_X_INVERSE,
+                      0.25,
+                    ]}
+                  >
+                    <Rect
+                      width={9}
+                      height={34}
+                      y={19}
+                      fill={'#65503e'}
+                    />
+
+                    <Line
+                      points={[
+                        [0, -52],
+                        [29, 12],
+                        [-29, 12],
+                      ]}
+                      closed
+                      fill={
+                        index % 2 === 0
+                          ? '#2d6857'
+                          : '#34735e'
+                      }
+                    />
+
+                    <Line
+                      points={[
+                        [0, -23],
+                        [35, 36],
+                        [-35, 36],
+                      ]}
+                      closed
+                      fill={
+                        index % 2 === 0
+                          ? '#285f50'
+                          : '#306a58'
+                      }
+                    />
+                  </Node>
                 ),
               )}
             </Node>
@@ -648,203 +951,54 @@ export default makeScene2D(function* (view) {
             {/*
              * ================================================
              * DOOM
+             *
+             * The complicated hand-built vector Doom scene is
+             * gone. This uses the finished artwork directly.
+             * The surrounding content Rect already clips to the
+             * exact same 14px radius as the mountain scene.
              * ================================================
              */}
 
-            <Node
-              ref={doomScene}
+            <Rect
+              ref={doomFrame}
+              width={CONTENT_WIDTH}
+              height={CONTENT_HEIGHT}
+              radius={14}
+              clip
               opacity={0}
             >
-              <Rect
-                width={680}
-                height={680}
-                fill={'#1a1010'}
+              <Img
+                ref={doomArtwork}
+                src={doomImage}
+                width={CONTENT_WIDTH + 8}
+                height={CONTENT_HEIGHT + 8}
+                opacity={1}
+                scale={DOOM_ZOOM_START}
               />
 
               <Rect
-                width={680}
-                height={240}
-                y={-220}
-                fill={'#571313'}
+                width={CONTENT_WIDTH}
+                height={CONTENT_HEIGHT}
+                radius={14}
+                fill={'rgba(0,0,0,0)'}
+                stroke={'#d1d1d1'}
+                lineWidth={3}
               />
-
-              <Line
-                ref={doomLeftWall}
-                points={[
-                  [-340, 35],
-                  [-125, 0],
-                  [-55, 55],
-                  [-55, 340],
-                  [-340, 340],
-                ]}
-                closed
-                fill={'#6f5840'}
-                opacity={0}
-              />
-
-              <Line
-                ref={doomRightWall}
-                points={[
-                  [340, 35],
-                  [125, 0],
-                  [55, 55],
-                  [55, 340],
-                  [340, 340],
-                ]}
-                closed
-                fill={'#745b43'}
-                opacity={0}
-              />
-
-              <Line
-                ref={doomFloor}
-                points={[
-                  [-340, 340],
-                  [-88, 74],
-                  [88, 74],
-                  [340, 340],
-                ]}
-                closed
-                fill={'#3f3328'}
-                opacity={0}
-              />
-
-              <Rect
-                ref={doomDoor}
-                width={122}
-                height={164}
-                y={42}
-                fill={'#1d1a18'}
-                stroke={'#8f7a57'}
-                lineWidth={6}
-                radius={6}
-                opacity={0}
-              />
-
-              <Node
-                ref={doomEnemy}
-                y={24}
-                opacity={0}
-                scale={0.42}
-              >
-                <Line
-                  points={[
-                    [-46, -10],
-                    [-28, -46],
-                    [-10, -28],
-                    [10, -28],
-                    [28, -46],
-                    [46, -10],
-                    [58, 36],
-                    [28, 70],
-                    [-28, 70],
-                    [-58, 36],
-                  ]}
-                  closed
-                  fill={'#8c2020'}
-                  stroke={'#4f0f0f'}
-                  lineWidth={4}
-                />
-
-                <Circle
-                  width={14}
-                  height={14}
-                  x={-15}
-                  y={0}
-                  fill={'#f8da72'}
-                />
-
-                <Circle
-                  width={14}
-                  height={14}
-                  x={15}
-                  y={0}
-                  fill={'#f8da72'}
-                />
-              </Node>
-
-              <Line
-                ref={doomGun}
-                points={[
-                  [-52, 340],
-                  [-24, 260],
-                  [24, 260],
-                  [52, 340],
-                ]}
-                closed
-                fill={'#6b7076'}
-                stroke={'#373b40'}
-                lineWidth={4}
-                opacity={0}
-              />
-
-              <Node
-                ref={doomHud}
-                y={296}
-                opacity={0}
-              >
-                <Rect
-                  width={680}
-                  height={88}
-                  fill={'#6c675a'}
-                />
-
-                <Rect
-                  x={-190}
-                  width={122}
-                  height={50}
-                  radius={10}
-                  fill={'#49453d'}
-                >
-                  <Txt
-                    text={'AMMO 50'}
-                    fill={'#d8d3c8'}
-                    fontSize={22}
-                    fontFamily={'Arial'}
-                    fontWeight={700}
-                  />
-                </Rect>
-
-                <Rect
-                  width={122}
-                  height={50}
-                  radius={10}
-                  fill={'#49453d'}
-                >
-                  <Txt
-                    text={'HEALTH 100'}
-                    fill={'#d8d3c8'}
-                    fontSize={20}
-                    fontFamily={'Arial'}
-                    fontWeight={700}
-                  />
-                </Rect>
-
-                <Rect
-                  x={190}
-                  width={122}
-                  height={50}
-                  radius={10}
-                  fill={'#49453d'}
-                >
-                  <Txt
-                    text={'ARMOR 0'}
-                    fill={'#d8d3c8'}
-                    fontSize={21}
-                    fontFamily={'Arial'}
-                    fontWeight={700}
-                  />
-                </Rect>
-              </Node>
-            </Node>
+            </Rect>
           </Rect>
         </Rect>
       </Node>
 
+      {/*
+       * -------------------------------------------------------
+       * POLYGLOT
+       * -------------------------------------------------------
+       */}
+
       <Txt
         ref={polyglotLabel}
         text={'POLYGLOT'}
-        y={390}
+        y={410}
         fill={'#61509d'}
         fontSize={47}
         fontFamily={'Arial'}
@@ -879,7 +1033,9 @@ export default makeScene2D(function* (view) {
           stroke={'#aaaaaa'}
           lineWidth={4}
           radius={14}
-          shadowColor={'rgba(0,0,0,0.17)'}
+          shadowColor={
+            'rgba(0,0,0,0.17)'
+          }
           shadowBlur={20}
           shadowOffsetY={9}
         />
@@ -904,7 +1060,9 @@ export default makeScene2D(function* (view) {
         />
 
         <Txt
-          text={'89 50 4E\n47 0D 0A'}
+          text={
+            '89 50 4E\n47 0D 0A'
+          }
           fill={'#777777'}
           fontSize={20}
           fontFamily={'monospace'}
@@ -943,7 +1101,9 @@ export default makeScene2D(function* (view) {
           fill={'#d4f0d5'}
           stroke={'#4d8d57'}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.12)'}
+          shadowColor={
+            'rgba(0,0,0,0.12)'
+          }
           shadowBlur={10}
           shadowOffsetY={4}
         >
@@ -965,7 +1125,9 @@ export default makeScene2D(function* (view) {
           fill={'#dcd6f2'}
           stroke={'#66539e'}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.12)'}
+          shadowColor={
+            'rgba(0,0,0,0.12)'
+          }
           shadowBlur={10}
           shadowOffsetY={4}
         >
@@ -1008,8 +1170,13 @@ export default makeScene2D(function* (view) {
       easeInCubic,
     );
 
-    openingGlyphRefs[index]().opacity(0);
-    openingByteRefs[index]().opacity(1);
+    openingGlyphRefs[
+      index
+    ]().opacity(0);
+
+    openingByteRefs[
+      index
+    ]().opacity(1);
 
     yield* node.scale(
       [1, 1],
@@ -1031,12 +1198,14 @@ export default makeScene2D(function* (view) {
 
     ...openingGlyphs.map(
       (_, index) =>
-        flipOpeningGlyphToByte(index),
+        flipOpeningGlyphToByte(
+          index,
+        ),
     ),
   );
 
   /*
-   * HEX → ABSTRACT CONTENTS
+   * HEX → FAKE FILE
    */
 
   yield* all(
@@ -1095,7 +1264,7 @@ export default makeScene2D(function* (view) {
   yield* waitFor(0.40);
 
   /*
-   * FILE CONTENTS SPLIT
+   * SPLIT LINES
    */
 
   yield* all(
@@ -1110,7 +1279,7 @@ export default makeScene2D(function* (view) {
   );
 
   /*
-   * INSERT PURPLE CONTENT
+   * INSERT PURPLE DATA
    */
 
   yield* sequence(
@@ -1127,7 +1296,9 @@ export default makeScene2D(function* (view) {
 
           ref().x(
             DATA_LEFT +
-              insertedLineWidths[index] /
+              insertedLineWidths[
+                index
+              ] /
                 2,
             0.52,
             easeInOutCubic,
@@ -1145,7 +1316,7 @@ export default makeScene2D(function* (view) {
   yield* waitFor(0.55);
 
   /*
-   * ABSTRACT CONTENTS → IMAGE.PNG
+   * FAKE DATA → IMAGE.PNG
    */
 
   yield* all(
@@ -1187,9 +1358,7 @@ export default makeScene2D(function* (view) {
   );
 
   /*
-   * ---------------------------------------------------------
-   * CURSOR ENTERS
-   * ---------------------------------------------------------
+   * CURSOR
    */
 
   yield* waitFor(0.18);
@@ -1211,20 +1380,13 @@ export default makeScene2D(function* (view) {
   yield* waitFor(0.12);
 
   /*
-   * ---------------------------------------------------------
    * CLICK
-   *
-   * Keep the clean cursor, but restore the expanding rings.
-   * ---------------------------------------------------------
    */
 
   clickRingA().opacity(1);
   clickRingB().opacity(1);
 
   yield* all(
-    /*
-     * Cursor presses down.
-     */
     cursor().scale(
       0.70,
       0.07,
@@ -1237,18 +1399,12 @@ export default makeScene2D(function* (view) {
       easeInCubic,
     ),
 
-    /*
-     * File responds very subtly.
-     */
     fileIcon().scale(
       0.985,
       0.07,
       easeInCubic,
     ),
 
-    /*
-     * First click ripple.
-     */
     clickRingA().scale(
       2.6,
       0.30,
@@ -1261,9 +1417,6 @@ export default makeScene2D(function* (view) {
       easeOutCubic,
     ),
 
-    /*
-     * Slightly slower outer ripple.
-     */
     chain(
       waitFor(0.035),
 
@@ -1282,10 +1435,6 @@ export default makeScene2D(function* (view) {
       ),
     ),
   );
-
-  /*
-   * Cursor releases.
-   */
 
   yield* all(
     cursor().scale(
@@ -1310,7 +1459,7 @@ export default makeScene2D(function* (view) {
   yield* waitFor(0.07);
 
   /*
-   * FILE → IMAGE VIEWER
+   * OPEN VIEWER
    */
 
   yield* all(
@@ -1346,7 +1495,11 @@ export default makeScene2D(function* (view) {
   );
 
   /*
+   * ---------------------------------------------------------
    * LANDSCAPE ASSEMBLES
+   *
+   * Same vertical timings/geometry as the square version.
+   * ---------------------------------------------------------
    */
 
   yield* all(
@@ -1378,6 +1531,36 @@ export default makeScene2D(function* (view) {
       waitFor(0.10),
 
       all(
+        cloudA().opacity(
+          1,
+          0.24,
+          easeOutCubic,
+        ),
+
+        cloudA().x(
+          -205,
+          0.38,
+          easeOutCubic,
+        ),
+
+        cloudB().opacity(
+          1,
+          0.24,
+          easeOutCubic,
+        ),
+
+        cloudB().x(
+          125,
+          0.38,
+          easeOutCubic,
+        ),
+      ),
+    ),
+
+    chain(
+      waitFor(0.14),
+
+      all(
         farMountains().opacity(
           1,
           0.24,
@@ -1393,7 +1576,7 @@ export default makeScene2D(function* (view) {
     ),
 
     chain(
-      waitFor(0.20),
+      waitFor(0.24),
 
       all(
         nearMountains().opacity(
@@ -1411,77 +1594,79 @@ export default makeScene2D(function* (view) {
     ),
 
     chain(
-      waitFor(0.28),
+      waitFor(0.31),
+
+      lake().opacity(
+        1,
+        0.35,
+        easeOutCubic,
+      ),
+    ),
+
+    chain(
+      waitFor(0.36),
 
       all(
-        leftLand().opacity(
+        leftShore().opacity(
           1,
-          0.24,
+          0.25,
           easeOutCubic,
         ),
 
-        leftLand().y(
+        leftShore().y(
           0,
-          0.46,
+          0.44,
           easeOutCubic,
         ),
 
-        rightLand().opacity(
+        rightShore().opacity(
           1,
-          0.24,
+          0.25,
           easeOutCubic,
         ),
 
-        rightLand().y(
+        rightShore().y(
           0,
-          0.46,
+          0.44,
           easeOutCubic,
         ),
       ),
     ),
 
     chain(
-      waitFor(0.34),
-
-      all(
-        river().opacity(
-          1,
-          0.22,
-          easeOutCubic,
-        ),
-
-        river().scale(
-          [1, 1],
-          0.54,
-          easeOutCubic,
-        ),
-      ),
-    ),
-
-    chain(
-      waitFor(0.42),
+      waitFor(0.44),
 
       sequence(
-        0.05,
+        0.045,
 
         ...treeRefs.map(
           (ref, index) =>
             all(
               ref().opacity(
                 1,
-                0.18,
+                0.17,
                 easeOutCubic,
               ),
 
+              /*
+               * Restore normal visual tree size,
+               * while cancelling the landscape's
+               * horizontal stretching.
+               */
               ref().scale(
-                1,
-                0.24,
+                [
+                  LANDSCAPE_X_INVERSE,
+                  1,
+                ],
+                0.26,
                 easeOutCubic,
               ),
 
               ref().y(
-                treePositions[index][1],
-                0.28,
+                treePositions[
+                  index
+                ][1],
+                0.30,
                 easeOutCubic,
               ),
             ),
@@ -1493,101 +1678,103 @@ export default makeScene2D(function* (view) {
   yield* waitFor(1.00);
 
   /*
-   * LANDSCAPE BREAKS APART + WINDOW FLIPS
+   * ---------------------------------------------------------
+   * LANDSCAPE BREAKS APART
+   * ---------------------------------------------------------
    */
 
   yield* all(
-    sun().x(
-      290,
-      0.46,
-      easeInOutCubic,
-    ),
-
-    sun().y(
-      -150,
-      0.46,
-      easeInOutCubic,
-    ),
-
-    sun().scale(
-      0.28,
-      0.46,
-      easeInCubic,
-    ),
-
     sun().opacity(
       0,
       0.40,
       easeInCubic,
     ),
 
-    farMountains().x(
-      -120,
-      0.46,
+    sun().scale(
+      0.3,
+      0.44,
+      easeInCubic,
+    ),
+
+    cloudA().x(
+      -280,
+      0.44,
       easeInOutCubic,
     ),
 
-    farMountains().rotation(
-      -7,
+    cloudA().opacity(
+      0,
+      0.40,
+      easeInCubic,
+    ),
+
+    cloudB().x(
+      205,
+      0.44,
+      easeInOutCubic,
+    ),
+
+    cloudB().opacity(
+      0,
+      0.40,
+      easeInCubic,
+    ),
+
+    farMountains().x(
+      -100,
       0.46,
       easeInOutCubic,
     ),
 
     farMountains().opacity(
       0,
-      0.46,
+      0.44,
       easeInCubic,
     ),
 
     nearMountains().x(
-      135,
-      0.46,
-      easeInOutCubic,
-    ),
-
-    nearMountains().rotation(
-      7,
+      110,
       0.46,
       easeInOutCubic,
     ),
 
     nearMountains().opacity(
       0,
+      0.44,
+      easeInCubic,
+    ),
+
+    lake().scale(
+      [1, 0.2],
       0.46,
       easeInCubic,
     ),
 
-    leftLand().x(
-      -140,
-      0.46,
-      easeInOutCubic,
-    ),
-
-    leftLand().opacity(
+    lake().opacity(
       0,
       0.42,
       easeInCubic,
     ),
 
-    rightLand().x(
-      140,
+    leftShore().x(
+      -130,
       0.46,
       easeInOutCubic,
     ),
 
-    rightLand().opacity(
+    leftShore().opacity(
       0,
       0.42,
       easeInCubic,
     ),
 
-    river().scale(
-      [0.18, 1],
+    rightShore().x(
+      130,
       0.46,
-      easeInCubic,
+      easeInOutCubic,
     ),
 
-    river().opacity(
+    rightShore().opacity(
       0,
       0.42,
       easeInCubic,
@@ -1597,11 +1784,13 @@ export default makeScene2D(function* (view) {
       (ref, index) =>
         all(
           ref().x(
-            treePositions[index][0] +
+            treePositions[
+              index
+            ][0] +
               (
-                index < 3
-                  ? -65
-                  : 65
+                index < 4
+                  ? -70
+                  : 70
               ),
             0.40,
             easeInOutCubic,
@@ -1609,14 +1798,18 @@ export default makeScene2D(function* (view) {
 
           ref().rotation(
             index % 2 === 0
-              ? -16
-              : 16,
+              ? -14
+              : 14,
             0.40,
             easeInOutCubic,
           ),
 
           ref().scale(
-            0.25,
+            [
+              0.25 *
+                LANDSCAPE_X_INVERSE,
+              0.25,
+            ],
             0.40,
             easeInCubic,
           ),
@@ -1649,21 +1842,39 @@ export default makeScene2D(function* (view) {
   );
 
   /*
-   * EDGE-ON:
-   * SWITCH TO DOOM
+   * SWITCH INTERPRETATION
    */
 
   landscape().opacity(0);
-
-  doomScene().opacity(1);
 
   programTitle().text(
     'Doom',
   );
 
   /*
-   * WINDOW REOPENS AS DOOM
+   * ---------------------------------------------------------
+   * DOOM FLIPS IN + ONE CONTINUOUS BACKGROUND ZOOM
+   * ---------------------------------------------------------
+   *
+   * Important: this uses plain `yield`, not `yield*`.
+   * That starts the zoom as a concurrent thread and lets the
+   * rest of the scene continue while that SAME tween keeps
+   * running. There are no separate push-ins.
    */
+
+  doomFrame().opacity(1);
+  doomArtwork().opacity(1);
+  doomArtwork().scale(DOOM_ZOOM_START);
+
+  /*
+   * Start the zoom BEFORE reopening the edge-on window.
+   * The image is therefore already moving as the flip reveals it.
+   */
+  yield doomArtwork().scale(
+    DOOM_ZOOM_END,
+    DOOM_ZOOM_DURATION,
+    linear,
+  );
 
   yield* all(
     programWindow().scale(
@@ -1677,80 +1888,18 @@ export default makeScene2D(function* (view) {
       0.72,
       easeOutCubic,
     ),
-
-    chain(
-      waitFor(0.10),
-
-      all(
-        doomLeftWall().opacity(
-          1,
-          0.20,
-          easeOutCubic,
-        ),
-
-        doomRightWall().opacity(
-          1,
-          0.20,
-          easeOutCubic,
-        ),
-
-        doomFloor().opacity(
-          1,
-          0.20,
-          easeOutCubic,
-        ),
-
-        doomDoor().opacity(
-          1,
-          0.24,
-          easeOutCubic,
-        ),
-      ),
-    ),
-
-    chain(
-      waitFor(0.24),
-
-      all(
-        doomEnemy().opacity(
-          1,
-          0.22,
-          easeOutCubic,
-        ),
-
-        doomEnemy().scale(
-          1,
-          0.30,
-          easeOutCubic,
-        ),
-      ),
-    ),
-
-    chain(
-      waitFor(0.30),
-
-      doomGun().opacity(
-        1,
-        0.18,
-        easeOutCubic,
-      ),
-    ),
-
-    chain(
-      waitFor(0.34),
-
-      doomHud().opacity(
-        1,
-        0.22,
-        easeOutCubic,
-      ),
-    ),
   );
 
+  /*
+   * Hold while the SAME background zoom keeps running.
+   */
   yield* waitFor(1.00);
 
   /*
-   * POLYGLOT REVEAL
+   * POLYGLOT
+   *
+   * Again, no Doom scale tween here. The original long zoom
+   * is still running in the background.
    */
 
   yield* all(
@@ -1767,7 +1916,7 @@ export default makeScene2D(function* (view) {
     ),
 
     polyglotLabel().y(
-      372,
+      392,
       0.45,
       easeOutCubic,
     ),
@@ -1796,6 +1945,18 @@ export default makeScene2D(function* (view) {
       -30,
       0.72,
       easeInOutCubic,
+    ),
+
+    doomArtwork().opacity(
+      0,
+      0.42,
+      easeInCubic,
+    ),
+
+    doomFrame().opacity(
+      0,
+      0.42,
+      easeInCubic,
     ),
 
     polyglotLabel().opacity(
