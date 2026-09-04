@@ -345,31 +345,23 @@ export default makeScene2D(function* (view) {
 
           <Txt
             text={'Text Editor'}
-            x={52}
+            x={0}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            width={308}
             fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
             fill={'#ffffff'}
-          />
-
-          <Txt
-            text={'%PNG....IHDR…'}
-            x={18}
-            y={-36}
-            width={340}
-            fontSize={34}
-            fontFamily={'monospace'}
-            fill={'#111111'}
             textAlign={'left'}
           />
 
           <Txt
-            text={'ÿØ...'}
-            x={-16}
-            y={18}
-            width={340}
-            fontSize={38}
+            text={'%PNG....IHDR...........sRGB\n....gAMA........IDATx....'}
+            x={0}
+            y={-65}
+            width={440}
+            fontSize={30}
+            lineHeight={42}
             fontFamily={'monospace'}
             fill={'#111111'}
             textAlign={'left'}
