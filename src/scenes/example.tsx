@@ -11,6 +11,8 @@ import {
 import {
   createRef,
   all,
+  chain,
+  sequence,
   waitFor,
   easeInOutCubic,
   easeOutCubic,
@@ -69,8 +71,8 @@ export default makeScene2D(function* (view) {
   const editorWindow = createRef<Node>();
 
   const rawBytes = ['89', '50', '4E', '47', '0D', '0A', '1A', '0A'];
+  const byteRefs = rawBytes.map(() => createRef<Rect>());
 
-  const HOLD_BEFORE_TRANSFORM = 174 / 60; // 20:14 -> 23:08 at 60 fps
   const COLLAPSE_DURATION = 0.50;
   const STEM_DRAW_DURATION = 0.16;
   const BRANCH_DRAW_DURATION = 0.38;
@@ -97,8 +99,8 @@ export default makeScene2D(function* (view) {
 
   view.add(
     <Node ref={root} scale={1.25}>
-      {/* FILE ICON — starts already in the end state of the previous shot */}
-      <Node ref={file} y={-200} opacity={1} scale={1}>
+      {/* PNG file */}
+      <Node ref={file} opacity={0} scale={0.08}>
         <Node y={-35}>
           <Line
             points={[
@@ -159,14 +161,15 @@ export default makeScene2D(function* (view) {
         stroke={'#777777'}
         lineWidth={5}
         lineCap={'round'}
-        end={1}
-        opacity={1}
+        end={0}
+        opacity={0}
       />
 
       {/* BYTES — visible at scene start */}
       <Node ref={bytes} y={85} opacity={1} scale={1}>
         {rawBytes.map((byte, index) => (
           <Rect
+            ref={byteRefs[index]}
             key={`${index}`}
             width={125}
             height={100}
@@ -175,8 +178,8 @@ export default makeScene2D(function* (view) {
             fill={'#eeeeee'}
             stroke={'#bdbdbd'}
             lineWidth={4}
-            opacity={1}
-            scale={1}
+            opacity={0}
+            scale={0.08}
           >
             <Txt
               text={byte}
@@ -371,8 +374,38 @@ export default makeScene2D(function* (view) {
     </Node>
   );
 
-  // Hold until the transformation point
-  yield* waitFor(HOLD_BEFORE_TRANSFORM);
+  // File icon and filename pop in.
+  yield* all(
+    file().opacity(1, 0.20),
+    chain(
+      file().scale(1.12, 0.19, easeInOutCubic),
+      file().scale(1, 0.06, easeOutCubic),
+    ),
+  );
+
+  // Let the file sit alone before revealing its contents.
+  yield* waitFor(0.90);
+
+  // Move the file upward and draw the connector.
+  yield* file().y(-200, 0.30, easeInOutCubic);
+  connector().opacity(1);
+  yield* connector().end(1, 0.20, easeInOutCubic);
+
+  // Reveal each byte in sequence.
+  yield* sequence(
+    0.07,
+    ...byteRefs.map(ref =>
+      all(
+        ref().opacity(1, 0.18),
+        chain(
+          ref().scale(1.12, 0.16, easeInOutCubic),
+          ref().scale(1, 0.06, easeOutCubic),
+        ),
+      ),
+    ),
+  );
+
+  yield* waitFor(0.79);
 
   // File disappears, connector disappears, bytes move upward
   yield* all(
