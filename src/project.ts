@@ -1,7 +1,8 @@
 import {makeProject} from '@motion-canvas/core';
 
-import example from './scenes/example?scene';
+import pngToBytes from './scenes/01-png-to-bytes?scene';
+import continuation from './scenes/02-continuation?scene';
 
 export default makeProject({
-  scenes: [example],
+  scenes: [pngToBytes, continuation],
 });
