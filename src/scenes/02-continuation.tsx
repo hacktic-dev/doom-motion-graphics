@@ -118,84 +118,87 @@ export default makeScene2D(function* (view) {
         <Line points={[[0, -100], [300, -100]]} stroke={'#b5b5b5'} lineWidth={5} lineDash={[13, 10]} />
       </Node>
 
-      <Node ref={transparencyGrid} y={40} opacity={0}>
-        {Array.from({length: 60}, (_, index) => {
-          const column = index % 10;
-          const row = Math.floor(index / 10);
-          return <Rect key={`${index}`} x={(column - 4.5) * 100} y={(row - 2.5) * 100} width={100} height={100} fill={(column + row) % 2 === 0 ? '#d8d8d8' : '#ffffff'} />;
+      <Node ref={transparencyGrid} opacity={0}>
+        {Array.from({length: 160}, (_, index) => {
+          const column = index % 16;
+          const row = Math.floor(index / 16);
+          return <Rect key={`${index}`} x={(column - 7.5) * 100} y={(row - 4.5) * 100} width={100} height={100} fill={(column + row) % 2 === 0 ? '#d8d8d8' : '#ffffff'} />;
         })}
       </Node>
     </Node>,
   );
 
-  const RESET_DURATION = 0.35;
+  const BASE_DURATION = 4.6;
+  const STRETCH_FACTOR = (BASE_DURATION + 22 / 60) / BASE_DURATION;
+  const t = (seconds: number) => seconds * STRETCH_FACTOR;
+  const RESET_DURATION = t(0.35);
 
   // Fade only the arrows and windows while returning the existing bytes to center.
   yield* all(
-    arrowGroup().opacity(0, 0.25, easeOutCubic),
-    windowGroup().opacity(0, 0.30, easeOutCubic),
+    arrowGroup().opacity(0, t(0.25), easeOutCubic),
+    windowGroup().opacity(0, t(0.30), easeOutCubic),
     byteRow().y(0, RESET_DURATION, easeInOutCubic),
   );
 
-  // 0.35–1.27: give the centered byte row time to breathe.
-  yield* waitFor(0.92);
+  // Give the centered byte row time to breathe.
+  yield* waitFor(t(0.92));
 
-  // 1.27–1.72: collapse the byte tiles into one red data object.
+  // Collapse the byte tiles into one white data object.
   yield* all(
     ...byteRefs.flatMap(ref => [
-      ref().x(0, 0.45, easeInOutCubic),
-      ref().width(230, 0.45, easeInOutCubic),
-      ref().height(230, 0.45, easeInOutCubic),
-      ref().radius(115, 0.45, easeInOutCubic),
-      ref().fill('#ffffff', 0.45, easeInOutCubic),
-      ref().stroke('#d0d0d0', 0.45, easeInOutCubic),
+      ref().x(0, t(0.45), easeInOutCubic),
+      ref().width(230, t(0.45), easeInOutCubic),
+      ref().height(230, t(0.45), easeInOutCubic),
+      ref().radius(115, t(0.45), easeInOutCubic),
+      ref().fill('#ffffff', t(0.45), easeInOutCubic),
+      ref().stroke('#d0d0d0', t(0.45), easeInOutCubic),
     ]),
-    ...byteTextRefs.map(ref => ref().opacity(0, 0.24, easeOutCubic)),
+    ...byteTextRefs.map(ref => ref().opacity(0, t(0.24), easeOutCubic)),
   );
   byteRefs.forEach(ref => ref().opacity(0));
   dataOrb().opacity(1);
   dataOrb().scale(1);
 
-  // 1.72–2.17: split the white data object into an RGB triangle.
+  // Split the white data object into an RGB triangle.
   yield* all(
-    dataOrb().opacity(0, 0.18, easeOutCubic),
-    redStamp().opacity(1, 0.12, easeOutCubic),
-    redStamp().position([0, -170], 0.45, easeInOutCubic),
-    redStamp().fill('#ef5350', 0.36, easeInOutCubic),
-    redStamp().scale(1, 0.45, easeOutCubic),
-    greenStamp().opacity(1, 0.12, easeOutCubic),
-    greenStamp().position([-240, 170], 0.45, easeInOutCubic),
-    greenStamp().fill('#66bb6a', 0.36, easeInOutCubic),
-    greenStamp().scale(1, 0.45, easeOutCubic),
-    blueStamp().opacity(1, 0.12, easeOutCubic),
-    blueStamp().position([240, 170], 0.45, easeInOutCubic),
-    blueStamp().fill('#42a5f5', 0.36, easeInOutCubic),
-    blueStamp().scale(1, 0.45, easeOutCubic),
+    dataOrb().opacity(0, t(0.18), easeOutCubic),
+    redStamp().opacity(1, t(0.12), easeOutCubic),
+    redStamp().position([0, -170], t(0.45), easeInOutCubic),
+    redStamp().fill('#ef5350', t(0.36), easeInOutCubic),
+    redStamp().scale(1, t(0.45), easeOutCubic),
+    greenStamp().opacity(1, t(0.12), easeOutCubic),
+    greenStamp().position([-240, 170], t(0.45), easeInOutCubic),
+    greenStamp().fill('#66bb6a', t(0.36), easeInOutCubic),
+    greenStamp().scale(1, t(0.45), easeOutCubic),
+    blueStamp().opacity(1, t(0.12), easeOutCubic),
+    blueStamp().position([240, 170], t(0.45), easeInOutCubic),
+    blueStamp().fill('#42a5f5', t(0.36), easeInOutCubic),
+    blueStamp().scale(1, t(0.45), easeOutCubic),
   );
-  yield* waitFor(0.51);
+  yield* waitFor(t(0.51));
 
-  // 2.68–3.13: turn the same object into a point on a coordinate plane.
+  // Turn the same object into a point on a coordinate plane.
   positionGuides().opacity(1);
   yield* all(
-    greenStamp().opacity(0, 0.20, easeOutCubic),
-    blueStamp().opacity(0, 0.20, easeOutCubic),
-    positionXAxis().end(1, 0.45, easeInOutCubic),
-    positionYAxis().end(1, 0.45, easeInOutCubic),
-    redStamp().position([300, -100], 0.45, easeInOutCubic),
-    redStamp().scale(0.32, 0.45, easeInOutCubic),
+    greenStamp().opacity(0, t(0.20), easeOutCubic),
+    blueStamp().opacity(0, t(0.20), easeOutCubic),
+    positionXAxis().end(1, t(0.45), easeInOutCubic),
+    positionYAxis().end(1, t(0.45), easeInOutCubic),
+    redStamp().position([300, -100], t(0.45), easeInOutCubic),
+    redStamp().scale(0.32, t(0.45), easeInOutCubic),
   );
-  yield* waitFor(0.50);
+  yield* waitFor(t(0.50));
 
-  // 3.63–4.08: dissolve the axes into a transparency grid.
+  // Dissolve the axes into a transparency grid.
   yield* all(
-    positionGuides().opacity(0, 0.25, easeOutCubic),
-    transparencyGrid().opacity(1, 0.45, easeOutCubic),
-    redStamp().position([0, 40], 0.45, easeInOutCubic),
-    redStamp().fill('#42a5f5', 0.45, easeInOutCubic),
-    redStamp().opacity(0.48, 0.45, easeInOutCubic),
-    redStamp().scale(1.5, 0.45, easeInOutCubic),
+    positionGuides().opacity(0, t(0.25), easeOutCubic),
+    transparencyGrid().opacity(1, t(0.45), easeOutCubic),
+    redStamp().position([0, 40], t(0.45), easeInOutCubic),
+    redStamp().fill('#42a5f5', t(0.45), easeInOutCubic),
+    redStamp().opacity(0.48, t(0.45), easeInOutCubic),
+    redStamp().scale(1.5, t(0.45), easeInOutCubic),
   );
 
   // Hold the final transparency state.
-  yield* waitFor(0.52);
+  yield* waitFor(t(0.52));
 });
