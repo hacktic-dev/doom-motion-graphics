@@ -10,17 +10,35 @@ import {
   waitFor,
 } from '@motion-canvas/core';
 
-const rawBytes = ['89', '50', '4E', '47', '0D', '0A', '1A', '0A'];
-const textCharacters = ['‰', 'P', 'N', 'G', '·', '·', '·', '·'];
-const selectedSquares = [84, 85, 86, 87, 88, 89, 90, 91];
+const rawBytes = [
+  '89', '50', '4E', '47', '0D', '0A', '1A', '0A',
+  '00', '00', '00', '0D', '49', '48', '44', '52',
+  '00', '00', '00', '20', '00', '00', '00', '20',
+  '08', '06', '00', '00', '00', '73', '7A', '7A',
+];
+const textCharacters = [
+  '‰', 'P', 'N', 'G', '·', '·', '·', '·',
+  '·', '·', '·', '·', 'I', 'H', 'D', 'R',
+  '·', '·', '·', ' ', '·', '·', '·', ' ',
+  '·', '·', '·', '·', '·', 's', 'z', 'z',
+];
+const selectedSquares = Array.from({length: 32}, (_, index) => 64 + index);
+const continuationLines = [
+  '....sRGB....gAMA....cHRM....',
+  '....IDATxœíÝwÜFõÿ÷ß{æÞ....',
+  '·÷·²IÎ$K’¬ØŽ¥ø¿ê....IEND®B`‚',
+];
+const continuationCharacters = continuationLines.flatMap((line, row) =>
+  Array.from(line).map((character, column) => ({character, column, row})),
+);
 
 export default makeScene2D(function* (view) {
   const checkerRefs = Array.from({length: 160}, () => createRef<Rect>());
   const byteTextRefs = rawBytes.map(() => createRef<Txt>());
   const glyphRefs = textCharacters.map(() => createRef<Txt>());
+  const continuationCharacterRefs = continuationCharacters.map(() => createRef<Txt>());
   const transparentCircle = createRef<Circle>();
   const editorWindow = createRef<Node>();
-  const editorText = createRef<Txt>();
 
   const byteRefs = selectedSquares.map(index => checkerRefs[index]);
   const collapsingRefs = checkerRefs.filter((_, index) => !selectedSquares.includes(index));
@@ -48,7 +66,7 @@ export default makeScene2D(function* (view) {
                 ref={byteTextRefs[byteIndex]}
                 text={rawBytes[byteIndex]}
                 fill={'#2b2b2b'}
-                fontSize={46}
+                fontSize={28}
                 fontFamily={'monospace'}
                 fontWeight={700}
                 opacity={0}
@@ -99,18 +117,21 @@ export default makeScene2D(function* (view) {
             fill={'#ffffff'}
             textAlign={'left'}
           />
-          <Txt
-            ref={editorText}
-            text={''}
-            x={0}
-            y={-55}
-            width={930}
-            fontSize={35}
-            lineHeight={49}
-            fontFamily={'monospace'}
-            fill={'#222222'}
-            textAlign={'left'}
-          />
+          {continuationCharacters.map(({character, column, row}, index) => (
+            <Txt
+              ref={continuationCharacterRefs[index]}
+              key={`${index}`}
+              text={character}
+              x={-449.5 + column * 29}
+              y={-106 + row * 49}
+              fontSize={32}
+              fontFamily={'monospace'}
+              fontWeight={700}
+              fill={'#222222'}
+              opacity={0}
+              scale={[0, 1]}
+            />
+          ))}
         </Rect>
       </Node>
 
@@ -120,20 +141,36 @@ export default makeScene2D(function* (view) {
           ref={ref}
           key={`${index}`}
           text={textCharacters[index]}
-          x={(index - 3.5) * 155}
-          y={-270}
-          fontSize={52}
+          x={(index % 16 - 7.5) * 90}
+          y={-300 + Math.floor(index / 16) * 82}
+          fontSize={32}
           fontFamily={'monospace'}
           fontWeight={700}
           fill={'#222222'}
           opacity={0}
+          scale={[0, 1]}
           zIndex={3}
         />
       ))}
     </Node>,
   );
 
-  // Collapse the checkerboard cells individually while preserving eight cells.
+  function* flipByteIntoEditor(index: number) {
+    const tile = byteRefs[index]();
+    const glyph = glyphRefs[index]();
+    const targetX = (index - 15.5) * 29;
+
+    yield* tile.scale([0, 1], 0.09, easeInCubic);
+    tile.opacity(0);
+    glyph.opacity(1);
+
+    yield* all(
+      glyph.scale([1, 1], 0.09, easeOutCubic),
+      glyph.position([targetX, -25], 0.38, easeInOutCubic),
+    );
+  }
+
+  // Collapse the checkerboard cells individually while preserving 32 cells.
   yield* all(
     transparentCircle().opacity(0, 0.28, easeOutCubic),
     transparentCircle().scale(0.25, 0.32, easeInCubic),
@@ -145,16 +182,16 @@ export default makeScene2D(function* (view) {
       )),
     ),
     sequence(
-      0.035,
+      0.015,
       ...byteRefs.map((ref, index) => all(
-        ref().x((index - 3.5) * 155, 0.60, easeInOutCubic),
-        ref().y(-270, 0.60, easeInOutCubic),
-        ref().width(125, 0.60, easeInOutCubic),
-        ref().height(100, 0.60, easeInOutCubic),
-        ref().radius(12, 0.60, easeInOutCubic),
+        ref().x((index % 16 - 7.5) * 90, 0.60, easeInOutCubic),
+        ref().y(-300 + Math.floor(index / 16) * 82, 0.60, easeInOutCubic),
+        ref().width(80, 0.60, easeInOutCubic),
+        ref().height(64, 0.60, easeInOutCubic),
+        ref().radius(8, 0.60, easeInOutCubic),
         ref().fill('#eeeeee', 0.60, easeInOutCubic),
         ref().stroke('#bdbdbd', 0.60, easeInOutCubic),
-        ref().lineWidth(4, 0.60, easeInOutCubic),
+        ref().lineWidth(3, 0.60, easeInOutCubic),
         chain(waitFor(0.31), byteTextRefs[index]().opacity(1, 0.20, easeOutCubic)),
       )),
     ),
@@ -168,25 +205,24 @@ export default makeScene2D(function* (view) {
     editorWindow().scale(1, 0.42, easeOutCubic),
   );
 
-  // Byte tiles give way to character forms that fall into the editor.
+  const BYTE_STAGGER = 0.025;
+
+  // Keep the boundary continuous: the first generated character starts one
+  // stagger interval after the final byte-derived character starts flipping.
   yield* all(
     sequence(
-      0.065,
-      ...byteRefs.map((ref, index) => all(
-        ref().opacity(0, 0.13, easeOutCubic),
-        ref().scale(0.72, 0.13, easeInCubic),
-        glyphRefs[index]().opacity(1, 0.10, easeOutCubic),
-        glyphRefs[index]().position([(index - 3.5) * 72, -35], 0.46, easeInOutCubic),
-        chain(waitFor(0.30), glyphRefs[index]().opacity(0, 0.16, easeOutCubic)),
-      )),
+      BYTE_STAGGER,
+      ...byteRefs.map((_, index) => flipByteIntoEditor(index)),
     ),
-    editorText().text(
-      '‰PNG....IHDR...........sRGB....gAMA....\n' +
-      '....IDATxœíÝwÜFõÿ÷ß{æÞ....\n' +
-      '·÷·²IÎ$K’¬ØŽ¥ø¿ê....\n' +
-      '...IEND®B`‚',
-      1.15,
-      easeInOutCubic,
+    chain(
+      waitFor(BYTE_STAGGER * byteRefs.length),
+      sequence(
+        0.015,
+        ...continuationCharacterRefs.map(ref => all(
+          ref().opacity(1, 0.08, easeOutCubic),
+          ref().scale([1, 1], 0.12, easeOutCubic),
+        )),
+      ),
     ),
   );
 
