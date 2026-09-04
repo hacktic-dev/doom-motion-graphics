@@ -142,7 +142,7 @@ export default makeScene2D(function* (view) {
 
         <Txt
           text={'image.png'}
-          fill={'#111111'}
+          fill={'#2b2b2b'}
           fontSize={34}
           fontFamily={'Arial'}
           fontWeight={500}
@@ -181,7 +181,7 @@ export default makeScene2D(function* (view) {
           >
             <Txt
               text={byte}
-              fill={'#222222'}
+              fill={'#2b2b2b'}
               fontSize={46}
               fontFamily={'monospace'}
               fontWeight={700}
