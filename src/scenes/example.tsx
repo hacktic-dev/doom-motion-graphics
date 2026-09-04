@@ -277,25 +277,19 @@ export default makeScene2D(function* (view) {
 
           <Txt
             text={'Image Viewer'}
-            x={58}
+            x={0}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
+            width={308}
             fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
             fill={'#ffffff'}
+            textAlign={'left'}
           />
 
-          <Rect
-            width={300}
-            height={200}
-            y={30}
-            fill={'#ffffff'}
-            stroke={'#d7d7d7'}
-            lineWidth={2}
-            clip
-          >
-            <PngPreview scale={2.4} />
-          </Rect>
+          <Node y={21}>
+            <PngPreview scale={3.15} />
+          </Node>
         </Rect>
       </Node>
 
