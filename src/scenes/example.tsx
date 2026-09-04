@@ -2,6 +2,7 @@ import {
   makeScene2D,
   Node,
   Line,
+  Path,
   Rect,
   Circle,
   Txt,
@@ -10,7 +11,6 @@ import {
 import {
   createRef,
   all,
-  chain,
   waitFor,
   easeInOutCubic,
   easeOutCubic,
@@ -61,13 +61,9 @@ export default makeScene2D(function* (view) {
   const connector = createRef<Line>();
   const bytes = createRef<Node>();
 
-  const leftArrow = createRef<Line>();
-  const rightArrow = createRef<Line>();
-
-  const leftArrowHeadA = createRef<Line>();
-  const leftArrowHeadB = createRef<Line>();
-  const rightArrowHeadA = createRef<Line>();
-  const rightArrowHeadB = createRef<Line>();
+  const splitStem = createRef<Line>();
+  const leftArrow = createRef<Path>();
+  const rightArrow = createRef<Path>();
 
   const viewerWindow = createRef<Node>();
   const editorWindow = createRef<Node>();
@@ -76,6 +72,8 @@ export default makeScene2D(function* (view) {
 
   const HOLD_BEFORE_TRANSFORM = 174 / 60; // 20:14 -> 23:08 at 60 fps
   const COLLAPSE_DURATION = 0.50;
+  const STEM_DRAW_DURATION = 0.16;
+  const BRANCH_DRAW_DURATION = 0.38;
   const WINDOW_REVEAL_DURATION = 0.40;
   const LEFT_FOCUS_HOLD = 0.60;
   const SWAP_DURATION = 0.35;
@@ -168,7 +166,7 @@ export default makeScene2D(function* (view) {
       <Node ref={bytes} y={85} opacity={1} scale={1}>
         {rawBytes.map((byte, index) => (
           <Rect
-            key={index}
+            key={`${index}`}
             width={125}
             height={100}
             x={(index - (rawBytes.length - 1) / 2) * 155}
@@ -190,76 +188,41 @@ export default makeScene2D(function* (view) {
         ))}
       </Node>
 
-      {/* STRAIGHT VERTICAL ARROWS */}
+      {/* SHARED STEM AND CURVED SPLIT ARROWS */}
       <Line
+        ref={splitStem}
+        points={[
+          [0, -92],
+          [0, -66],
+        ]}
+        stroke={'#333333'}
+        lineWidth={5}
+        lineCap={'round'}
+        end={0}
+        opacity={0}
+      />
+
+      <Path
         ref={leftArrow}
-        points={[
-          [-WINDOW_X, -92],
-          [-WINDOW_X, 8],
-        ]}
+        data={`M 0 -66 C 0 -25, ${-WINDOW_X} -40, ${-WINDOW_X} -5 L ${-WINDOW_X} 22`}
         stroke={'#333333'}
         lineWidth={5}
         lineCap={'round'}
+        endArrow
+        arrowSize={14}
         end={0}
         opacity={0}
       />
 
-      <Line
+      <Path
         ref={rightArrow}
-        points={[
-          [WINDOW_X, -92],
-          [WINDOW_X, 8],
-        ]}
+        data={`M 0 -66 C 0 -25, ${WINDOW_X} -40, ${WINDOW_X} -5 L ${WINDOW_X} 22`}
         stroke={'#333333'}
         lineWidth={5}
         lineCap={'round'}
+        endArrow
+        arrowSize={14}
         end={0}
-        opacity={0}
-      />
-
-      <Line
-        ref={leftArrowHeadA}
-        points={[
-          [-WINDOW_X, 8],
-          [-WINDOW_X - 14, -10],
-        ]}
-        stroke={'#333333'}
-        lineWidth={5}
-        lineCap={'round'}
-        opacity={0}
-      />
-      <Line
-        ref={leftArrowHeadB}
-        points={[
-          [-WINDOW_X, 8],
-          [-WINDOW_X + 14, -10],
-        ]}
-        stroke={'#333333'}
-        lineWidth={5}
-        lineCap={'round'}
-        opacity={0}
-      />
-
-      <Line
-        ref={rightArrowHeadA}
-        points={[
-          [WINDOW_X, 8],
-          [WINDOW_X - 14, -10],
-        ]}
-        stroke={'#333333'}
-        lineWidth={5}
-        lineCap={'round'}
-        opacity={0}
-      />
-      <Line
-        ref={rightArrowHeadB}
-        points={[
-          [WINDOW_X, 8],
-          [WINDOW_X + 14, -10],
-        ]}
-        stroke={'#333333'}
-        lineWidth={5}
-        lineCap={'round'}
         opacity={0}
       />
 
@@ -432,25 +395,20 @@ export default makeScene2D(function* (view) {
     bytes().y(FINAL_BYTES_Y, COLLAPSE_DURATION, easeInOutCubic),
   );
 
-  // Draw arrows and reveal windows.
+  // Draw the shared stem, then both curved branches.
+  splitStem().opacity(1);
+  yield* splitStem().end(1, STEM_DRAW_DURATION, easeInOutCubic);
+
+  leftArrow().opacity(1);
+  rightArrow().opacity(1);
+  yield* all(
+    leftArrow().end(1, BRANCH_DRAW_DURATION, easeInOutCubic),
+    rightArrow().end(1, BRANCH_DRAW_DURATION, easeInOutCubic),
+  );
+
+  // Reveal the windows only after the split-arrow drawing is complete.
   // Image viewer starts focused, text editor starts dimmed.
   yield* all(
-    leftArrow().opacity(1, 0),
-    rightArrow().opacity(1, 0),
-
-    leftArrow().end(1, WINDOW_REVEAL_DURATION, easeInOutCubic),
-    rightArrow().end(1, WINDOW_REVEAL_DURATION, easeInOutCubic),
-
-    chain(
-      waitFor(WINDOW_REVEAL_DURATION * 0.72),
-      all(
-        leftArrowHeadA().opacity(1, 0.08, easeOutCubic),
-        leftArrowHeadB().opacity(1, 0.08, easeOutCubic),
-        rightArrowHeadA().opacity(1, 0.08, easeOutCubic),
-        rightArrowHeadB().opacity(1, 0.08, easeOutCubic),
-      ),
-    ),
-
     viewerWindow().opacity(FOCUSED_OPACITY, WINDOW_REVEAL_DURATION * 0.8, easeOutCubic),
     viewerWindow().scale(FOCUSED_SCALE, WINDOW_REVEAL_DURATION, easeOutCubic),
 
