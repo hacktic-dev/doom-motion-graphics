@@ -14,7 +14,6 @@ import {
   easeInCubic,
   easeInOutCubic,
   easeOutCubic,
-  sequence,
   waitFor,
 } from '@motion-canvas/core';
 
@@ -128,9 +127,8 @@ export default makeScene2D(function* (view) {
   const destination = createRef<Node>();
   const leftPath = createRef<Line>();
   const rightPath = createRef<Line>();
-  const markupGroup = createRef<Node>();
-  const markupRefs = ['<html>', '<canvas>', '<script>'].map(() => createRef<Txt>());
-  const browserCodeRefs = ['<html>', '<canvas>', '<script>'].map(() => createRef<Txt>());
+  const browserTag = createRef<Node>();
+  const playButton = createRef<Node>();
 
   view.add(
     <Rect width={'100%'} height={'100%'} fill={COLORS.background} zIndex={-100} />,
@@ -138,24 +136,6 @@ export default makeScene2D(function* (view) {
 
   view.add(
     <Node scale={1.25}>
-      <Node ref={markupGroup}>
-        {['<html>', '<canvas>', '<script>'].map((text, index) => (
-          <Txt
-            ref={markupRefs[index]}
-            key={text}
-            text={text}
-            y={(index - 1) * 76}
-            x={index === 1 ? 35 : index === 2 ? -25 : 0}
-            fill={index === 2 ? COLORS.accent : COLORS.text}
-            fontSize={48}
-            fontFamily={'Courier New'}
-            fontWeight={700}
-            opacity={0}
-            scale={0.72}
-          />
-        ))}
-      </Node>
-
       <Node ref={htmlFile} opacity={0} scale={0.08}>
         <FileShape kind={'html'} />
         <Txt
@@ -168,7 +148,7 @@ export default makeScene2D(function* (view) {
         />
       </Node>
 
-      <Node ref={browser} opacity={0} scale={0.18}>
+      <Node ref={browser} opacity={0} scale={[0.155, 0.266]}>
         <Rect
           width={WINDOW_WIDTH}
           height={WINDOW_HEIGHT}
@@ -192,20 +172,26 @@ export default makeScene2D(function* (view) {
             fontFamily={'monospace'}
           />
           <Rect width={CONTENT_WIDTH} height={CONTENT_HEIGHT} y={32} radius={12} fill={'#11131A'} clip>
-            {['<html>', '<canvas>', '<script>'].map((text, index) => (
-              <Txt
-                ref={browserCodeRefs[index]}
-                key={`browser-${text}`}
-                text={text}
-                x={-390}
-                y={(index - 1) * 72}
-                fill={index === 2 ? COLORS.accent : COLORS.textMuted}
-                fontSize={46}
-                fontFamily={'Courier New'}
-                fontWeight={700}
-                opacity={1}
+            <Node ref={browserTag} y={-22} scale={2.15}>
+              <HtmlTag />
+            </Node>
+
+            <Node ref={playButton} y={112} opacity={0} scale={0.25}>
+              <Circle
+                width={104}
+                height={104}
+                fill={COLORS.accent}
+                shadowColor={'rgba(140,124,255,0.30)'}
+                shadowBlur={20}
               />
-            ))}
+              <Line
+                points={[[-13, -24], [31, 0], [-13, 24]]}
+                closed
+                fill={COLORS.text}
+                stroke={COLORS.text}
+                lineWidth={3}
+              />
+            </Node>
             <Img
               ref={doomArtwork}
               src={doomScreenshot}
@@ -277,57 +263,50 @@ export default makeScene2D(function* (view) {
     </Node>,
   );
 
-  // 0.00–0.90: recognisable HTML fragments assemble first.
-  yield* sequence(
-    0.18,
-    ...markupRefs.map(ref => all(
-      ref().opacity(1, 0.24, easeOutCubic),
-      ref().scale(1, 0.35, easeOutCubic),
-    )),
-  );
-  yield* waitFor(0.19);
-
-  // 0.90–1.50: the markup folds into one self-contained doom.html file.
+  // 0.00–0.80: establish the self-contained HTML file.
   yield* all(
-    ...markupRefs.map(ref => all(
-      ref().position([0, 0], 0.52, easeInOutCubic),
-      ref().scale(0.15, 0.55, easeInCubic),
-      ref().opacity(0, 0.48, easeInCubic),
-    )),
-    chain(
-      waitFor(0.18),
-      all(
-        htmlFile().opacity(1, 0.24, easeOutCubic),
-        htmlFile().scale(1, 0.42, easeOutCubic),
-      ),
-    ),
+    htmlFile().opacity(1, 0.24, easeOutCubic),
+    htmlFile().scale(1, 0.45, easeOutCubic),
   );
+  yield* waitFor(0.35);
 
-  // 1.50–2.40: the file expands into a browser and Doom becomes visible.
+  // 0.80–1.20: a restrained pulse anticipates execution.
+  yield* chain(
+    htmlFile().scale(1.07, 0.18, easeOutCubic),
+    htmlFile().scale(1, 0.18, easeInOutCubic),
+  );
+  yield* waitFor(0.04);
+
+  // 1.20–2.00: the file itself unfolds into browser chrome. Starting the
+  // browser at the file's proportions keeps this as one continuous object.
   yield* all(
-    htmlFile().opacity(0, 0.28, easeInCubic),
-    htmlFile().scale(0.22, 0.48, easeInCubic),
-    chain(
-      waitFor(0.18),
-      all(
-        browser().opacity(1, 0.30, easeOutCubic),
-        browser().scale(1, 0.58, easeOutCubic),
-      ),
-    ),
-    chain(
-      waitFor(0.42),
-      all(
-        ...browserCodeRefs.map((ref, index) => chain(
-          waitFor(index * 0.05),
-          ref().opacity(0, 0.24, easeInCubic),
-        )),
-        doomArtwork().opacity(1, 0.48, easeOutCubic),
-      ),
-    ),
+    htmlFile().opacity(0, 0.34, easeInCubic),
+    htmlFile().scale([6.1, 3.55], 0.80, easeInOutCubic),
+    browser().opacity(1, 0.22, easeOutCubic),
+    browser().scale([1, 1], 0.80, easeInOutCubic),
   );
 
-  // 2.40–6.25: allow the running program to register.
-  yield* waitFor(3.85);
+  // 2.00–2.35: the retained code mark becomes an executable play control.
+  yield* all(
+    browserTag().y(-72, 0.35, easeInOutCubic),
+    browserTag().scale(1.55, 0.35, easeInOutCubic),
+    playButton().opacity(1, 0.24, easeOutCubic),
+    playButton().scale(1, 0.35, easeOutCubic),
+  );
+
+  // 2.35–3.00: pressing play replaces the HTML mark with the running program.
+  yield* all(
+    chain(
+      playButton().scale(0.82, 0.10, easeInCubic),
+      playButton().scale(1.12, 0.12, easeOutCubic),
+      playButton().opacity(0, 0.20, easeInCubic),
+    ),
+    browserTag().opacity(0, 0.30, easeInCubic),
+    chain(waitFor(0.14), doomArtwork().opacity(1, 0.51, easeOutCubic)),
+  );
+
+  // 3.00–6.25: allow the running program to register.
+  yield* waitFor(3.25);
 
   // 6.25–7.05: collapse the whole browser back into doom.html.
   yield* all(
