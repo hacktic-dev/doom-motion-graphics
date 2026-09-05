@@ -33,7 +33,7 @@ const COLORS = {
   text: '#F4F6FA',
   purple: '#8C7CFF',
   purpleSoft: '#A996FF',
-  shadow: 'rgba(0,0,0,0.24)',
+  shadow: 'rgba(0,0,0,0.28)',
 };
 
 const WINDOW_WIDTH = 1204;

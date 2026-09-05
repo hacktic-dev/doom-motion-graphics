@@ -25,7 +25,7 @@ const COLORS = {
   titlebar: '#1B1D26',
   borderStrong: '#646B82',
   titleText: '#C4CBDA',
-  shadow: 'rgba(0,0,0,0.24)',
+  shadow: 'rgba(0,0,0,0.28)',
 
   paper: '#3A3E52',
   paperDark: '#2B2E3B',
@@ -303,8 +303,8 @@ function HtmlStrip({
       radius={14}
       fill={color}
       shadowColor={'rgba(0,0,0,0.18)'}
-      shadowBlur={10}
-      shadowOffsetY={4}
+      shadowBlur={12}
+      shadowOffsetY={5}
       opacity={0.92}
     >
       <Rect
@@ -512,9 +512,9 @@ export default makeScene2D(function* (view) {
             y={0}
             radius={22}
             fill={COLORS.paper}
-            shadowColor={'rgba(0,0,0,0.30)'}
-            shadowBlur={26}
-            shadowOffsetY={14}
+            shadowColor={COLORS.shadow}
+            shadowBlur={28}
+            shadowOffsetY={12}
             opacity={0}
           />
 
@@ -543,9 +543,9 @@ export default makeScene2D(function* (view) {
             y={0}
             radius={22}
             fill={COLORS.paper}
-            shadowColor={'rgba(0,0,0,0.30)'}
-            shadowBlur={26}
-            shadowOffsetY={14}
+            shadowColor={COLORS.shadow}
+            shadowBlur={28}
+            shadowOffsetY={12}
           />
 
           <Rect
@@ -569,8 +569,8 @@ export default makeScene2D(function* (view) {
               radius={20}
               fill={COLORS.orange}
               shadowColor={'rgba(0,0,0,0.18)'}
-              shadowBlur={10}
-              shadowOffsetY={4}
+              shadowBlur={12}
+              shadowOffsetY={5}
             />
             <Txt
               text={'tEXt'}
@@ -584,7 +584,7 @@ export default makeScene2D(function* (view) {
           <Node
             ref={noteAuthor}
             x={0}
-            y={-100}
+            y={-75}
           >
             <MetadataSlip
               width={440}
@@ -595,7 +595,7 @@ export default makeScene2D(function* (view) {
           <Node
             ref={noteComment}
             x={0}
-            y={-15}
+            y={10}
           >
             <MetadataSlip
               width={440}
@@ -606,7 +606,7 @@ export default makeScene2D(function* (view) {
           <Node
             ref={noteSoftware}
             x={0}
-            y={70}
+            y={95}
           >
             <MetadataSlip
               width={440}

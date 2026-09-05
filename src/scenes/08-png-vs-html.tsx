@@ -1,5 +1,6 @@
 import {
   Circle,
+  Img,
   Line,
   Node,
   Path,
@@ -20,6 +21,7 @@ import {
 } from '@motion-canvas/core';
 
 import {PngPreview} from '../components/PngPreview';
+import doomguyImage from '../img/doomguy.png';
 import {Scene4Landscape as Scene7Landscape} from './07-png-metadata';
 
 const COLORS = {
@@ -31,7 +33,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   titleText: '#C4CBDA',
-  shadow: 'rgba(0,0,0,0.24)',
+  shadow: 'rgba(0,0,0,0.28)',
 
   paper: '#F4EEE4',
   orange: '#F09A57',
@@ -53,10 +55,10 @@ const COLORS = {
 };
 
 const PHOTO_START_SCALE = 1.248;
-// Scene 8 originally played in roughly 10.76 seconds.  The narrative beats
-// outside the canonical Scene 4 click are stretched uniformly to make the
-// complete scene exactly 14 seconds while preserving that click verbatim.
-const pace = (seconds: number) => seconds * 1.3436;
+// Compress the setup so the embedded HTML is absorbed by four seconds and
+// the canonical Scene 4 click can begin opening the viewer around 5.4s.
+// The recovered time is assigned to the long ghost-data hold at the end.
+const pace = (seconds: number) => seconds * 0.7184;
 
 const VIEWER_WIDTH = 1204;
 const VIEWER_HEIGHT = 842;
@@ -329,7 +331,7 @@ function ChunkCard() {
       stroke={COLORS.border}
       lineWidth={4}
       shadowColor={COLORS.shadow}
-      shadowBlur={18}
+      shadowBlur={22}
       shadowOffsetY={10}
     >
       <Rect
@@ -467,6 +469,7 @@ export default makeScene2D(function* (view) {
   const ghostB = createRef<Node>();
   const ghostC = createRef<Node>();
   const ghostD = createRef<Node>();
+  const doomPeek = createRef<Node>();
 
   view.add(
     <Rect width={'100%'} height={'100%'} fill={COLORS.background} zIndex={-100} />,
@@ -481,9 +484,9 @@ export default makeScene2D(function* (view) {
           y={0}
           radius={22}
           fill={'#3A3E52'}
-          shadowColor={'rgba(0,0,0,0.30)'}
-          shadowBlur={26}
-          shadowOffsetY={14}
+          shadowColor={COLORS.shadow}
+          shadowBlur={28}
+          shadowOffsetY={12}
         />
         <Rect
           width={720}
@@ -553,6 +556,16 @@ export default makeScene2D(function* (view) {
 
       <Node ref={viewer} x={0} y={0} opacity={0} scale={0.94} zIndex={9}>
         <ImageViewer />
+      </Node>
+
+      {/* Doom is physically present but remains behind the oblivious viewer. */}
+      <Node ref={doomPeek} x={560} y={78} opacity={0} scale={0.96} zIndex={8}>
+        <Img
+          src={doomguyImage}
+          width={340}
+          height={340}
+          smoothing={false}
+        />
       </Node>
 
       <Node ref={ghostA} x={-650} y={-205} opacity={0} rotation={-7} zIndex={15}>
@@ -691,7 +704,9 @@ export default makeScene2D(function* (view) {
 
   // The four code fragments drift independently around the viewer. Their
   // paths are slow, shallow arcs rather than synchronized mechanical hops.
-  const ghostDuration = pace(2.91);
+  // Let the hidden fragments breathe first, then use the remainder of the
+  // existing hold to reveal what the PNG viewer is completely unaware of.
+  const ghostDuration = 3.0;
   const ghostBases = [
     {node: ghostA, x: -650, y: -205, rotation: -7, phase: 0.15, direction: 1},
     {node: ghostB, x: 650, y: -190, rotation: 6, phase: 1.70, direction: -1},
@@ -737,6 +752,46 @@ export default makeScene2D(function* (view) {
       }
     }),
   );
+
+  // A single literal visual joke replaces another diagram: Doomguy peeks out
+  // from behind the completely unchanged image viewer, which never reacts.
+  yield* all(
+    doomPeek().opacity(1, 0.18, easeOutCubic),
+    doomPeek().x(735, 0.75, easeInOutCubic),
+    doomPeek().rotation(2.5, 0.75, easeInOutCubic),
+  );
+
+  // Hold completely still so the motion reads as a simple out-and-back peek.
+  yield* waitFor(2.0);
+
+  yield* all(
+    doomPeek().x(560, 0.75, easeInOutCubic),
+    doomPeek().rotation(0, 0.75, easeInOutCubic),
+    doomPeek().opacity(0, 0.62, easeInCubic),
+  );
+
+  // Restore the exact first frame of Scene 9 before handing off.
+  yield* all(
+    ghostA().position([-642.5794, -210.5102], 1.10, easeInOutCubic),
+    ghostB().position([656.4291, -188.3039], 1.10, easeInOutCubic),
+    ghostC().position([-660.1022, 219.3102], 1.10, easeInOutCubic),
+    ghostD().position([647.1772, 227.9165], 1.10, easeInOutCubic),
+    ghostA().rotation(-9.1509, 1.10, easeInOutCubic),
+    ghostB().rotation(4.1818, 1.10, easeInOutCubic),
+    ghostC().rotation(-5.1468, 1.10, easeInOutCubic),
+    ghostD().rotation(-13.0967, 1.10, easeInOutCubic),
+    ghostA().scale([0.991485, 1.008515], 1.10, easeInOutCubic),
+    ghostB().scale([0.997899, 1.002101], 1.10, easeInOutCubic),
+    ghostC().scale([1.007993, 0.992007], 1.10, easeInOutCubic),
+    ghostD().scale([1.004448, 0.995552], 1.10, easeInOutCubic),
+    ghostA().opacity(0.58, 0.82, easeOutCubic),
+    ghostB().opacity(0.54, 0.82, easeOutCubic),
+    ghostC().opacity(0.52, 0.82, easeOutCubic),
+    ghostD().opacity(0.56, 0.82, easeOutCubic),
+  );
+
+  // Preserve the original Scene 8 runtime; timing changes remain in Resolve.
+  yield* waitFor(0.40);
 
   yield* waitFor(pace(0.20));
 });

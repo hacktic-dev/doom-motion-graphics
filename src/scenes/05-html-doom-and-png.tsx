@@ -160,8 +160,8 @@ export default makeScene2D(function* (view) {
           radius={20}
           fill={COLORS.windowShell}
           shadowColor={COLORS.shadow}
-          shadowBlur={22}
-          shadowOffsetY={10}
+          shadowBlur={28}
+          shadowOffsetY={12}
           clip
         >
           <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={TITLEBAR_Y} fill={COLORS.titlebar} />

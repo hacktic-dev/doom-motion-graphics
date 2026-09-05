@@ -36,7 +36,7 @@ const COLORS = {
   yellow: '#F3C24F',
   orange: '#F09A57',
   purple: '#A996FF',
-  shadow: 'rgba(0,0,0,0.24)',
+  shadow: 'rgba(0,0,0,0.28)',
 };
 
 const CHUNKS = [
@@ -62,6 +62,10 @@ const IMAGE_WINDOW_WIDTH = 800;
 const IMAGE_WINDOW_HEIGHT = 620;
 const TITLEBAR_HEIGHT = 58;
 const TITLEBAR_Y = -IMAGE_WINDOW_HEIGHT / 2 + TITLEBAR_HEIGHT / 2;
+const CHUNKS_TITLE = 'Chunks';
+const CHUNKS_PILL_WIDTH = 430;
+const CHUNKS_PILL_HEIGHT = 94;
+const CHUNKS_PILL_COLLAPSED_WIDTH = 22;
 const LANDSCAPE_BASE_SIZE = 720;
 const LANDSCAPE_UNIFORM_SCALE = IMAGE_VIEW_HEIGHT / LANDSCAPE_BASE_SIZE;
 const LANDSCAPE_X_SCALE = IMAGE_VIEW_WIDTH / IMAGE_VIEW_HEIGHT;
@@ -268,7 +272,7 @@ function Scene5HandoffFileShape() {
         stroke={'#646B82'}
         lineWidth={5}
         radius={15}
-        shadowColor={'rgba(0,0,0,0.28)'}
+        shadowColor={COLORS.shadow}
         shadowBlur={22}
         shadowOffsetY={10}
       />
@@ -535,6 +539,8 @@ export default makeScene2D(function* (view) {
 
   const chunkStage = createRef<Node>();
   const chunkRefs = Array.from({length: CHUNKS.length}, () => createRef<Node>());
+  const chunksPill = createRef<Rect>();
+  const chunksTitle = createRef<Txt>();
 
   // The first IDAT chunk becomes the expanded chunk later.
   const focusChunk = chunkRefs[2];
@@ -579,7 +585,7 @@ export default makeScene2D(function* (view) {
             stroke={'#646B82'}
             lineWidth={5}
             radius={15}
-            shadowColor={'rgba(0,0,0,0.28)'}
+            shadowColor={COLORS.shadow}
             shadowBlur={22}
             shadowOffsetY={10}
           />
@@ -652,7 +658,7 @@ export default makeScene2D(function* (view) {
             fill={strip.color}
             shadowColor={COLORS.shadow}
             shadowBlur={12}
-            shadowOffsetY={6}
+            shadowOffsetY={5}
           />
           <Rect
             x={-strip.width / 2 + 28}
@@ -812,6 +818,33 @@ export default makeScene2D(function* (view) {
           </Node>
         ))}
       </Node>
+
+      {/* Brief chapter label between the two chunk rows, matching Scene 4. */}
+      <Rect
+        ref={chunksPill}
+        width={CHUNKS_PILL_COLLAPSED_WIDTH}
+        height={CHUNKS_PILL_HEIGHT}
+        y={0}
+        radius={16}
+        fill={COLORS.card}
+        shadowColor={COLORS.shadow}
+        shadowBlur={22}
+        shadowOffsetY={10}
+        opacity={0}
+        clip
+        zIndex={18}
+      >
+        <Txt
+          ref={chunksTitle}
+          text={''}
+          fill={COLORS.text}
+          fontSize={58}
+          fontFamily={'monospace'}
+          fontWeight={700}
+          textAlign={'center'}
+          width={CHUNKS_PILL_WIDTH - 70}
+        />
+      </Rect>
 
       {/* Image-data example. */}
       <Node ref={imageStage} opacity={0}>
@@ -1002,8 +1035,32 @@ export default makeScene2D(function* (view) {
     startFile().scale(1.02, 0.82, easeInCubic),
   );
 
-  // 5.07–8.57 — hold on all six PNG chunks for 3.5 seconds.
-  yield* waitFor(3.50);
+  // 5.07–8.57 — label the six sections as chunks, then clear the title
+  // before the IDAT chunk moves.  This replaces the existing 3.5-second hold,
+  // so every later Scene 6 cue keeps its original timing.
+  yield* waitFor(0.45);
+  chunksPill().opacity(1);
+  yield* chunksPill().width(
+    CHUNKS_PILL_WIDTH,
+    0.45,
+    easeInOutCubic,
+  );
+
+  yield* waitFor(0.10);
+  const chunksTimePerCharacter = 0.65 / CHUNKS_TITLE.length;
+  for (let index = 0; index < CHUNKS_TITLE.length; index++) {
+    chunksTitle().text(CHUNKS_TITLE.slice(0, index + 1));
+    yield* waitFor(chunksTimePerCharacter);
+  }
+
+  yield* waitFor(0.55);
+  yield* chunksPill().width(
+    CHUNKS_PILL_COLLAPSED_WIDTH,
+    0.45,
+    easeInOutCubic,
+  );
+  yield* chunksPill().opacity(0, 0.10, easeInCubic);
+  yield* waitFor(0.75);
 
   // 8.32–8.94 — choose one IDAT chunk and bring the same object to the centre.
   yield* all(
