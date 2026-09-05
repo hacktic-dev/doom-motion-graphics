@@ -145,9 +145,9 @@ const treePositions = [
 
 const DOOM_ZOOM_START = 1.004;
 const DOOM_ZOOM_END = 1.045;
-const DOOM_ZOOM_DURATION = 4.04;
-const DOOM_HOLD_BEFORE_FADE = 2.10;
-const EMPTY_GAP_BEFORE_SUMMARY = 3.00;
+const DOOM_ZOOM_DURATION = 2.10;
+const DOOM_HOLD_BEFORE_FADE = 0.90;
+const EMPTY_GAP_BEFORE_SUMMARY = 3.01;
 
 export default makeScene2D(function* (view) {
   /*
@@ -1198,58 +1198,16 @@ export default makeScene2D(function* (view) {
 
   /*
    * =========================================================
-   * HELPERS
-   * =========================================================
-   */
-
-  function* flipOpeningGlyphToByte(
-    index: number,
-  ) {
-    const node =
-      openingNodeRefs[index]();
-
-    yield* node.scale(
-      [0, 1],
-      0.10,
-      easeInCubic,
-    );
-
-    openingGlyphRefs[
-      index
-    ]().opacity(0);
-
-    openingByteRefs[
-      index
-    ]().opacity(1);
-
-    yield* node.scale(
-      [1, 1],
-      0.10,
-      easeOutCubic,
-    );
-  }
-
-  /*
-   * =========================================================
    * TIMELINE
    * =========================================================
    */
 
-  yield* waitFor(0.25);
-
-  yield* sequence(
-    0.08,
-
-    ...openingGlyphs.map(
-      (_, index) =>
-        flipOpeningGlyphToByte(
-          index,
-        ),
-    ),
-  );
+  // Hold the PNG signature briefly, then move straight into the
+  // document view. No intermediate glyph-to-hex flip.
+  yield* waitFor(0.20);
 
   /*
-   * HEX → FAKE FILE
+   * PNG SIGNATURE → FAKE FILE
    */
 
   yield* all(
@@ -1261,25 +1219,25 @@ export default makeScene2D(function* (view) {
           all(
             ref().x(
               0,
-              0.55,
+              0.48,
               easeInOutCubic,
             ),
 
             ref().y(
               0,
-              0.55,
+              0.48,
               easeInOutCubic,
             ),
 
             ref().scale(
               0.12,
-              0.55,
+              0.48,
               easeInCubic,
             ),
 
             ref().opacity(
               0,
-              0.42,
+              0.40,
               easeInCubic,
             ),
           ),
@@ -1287,7 +1245,7 @@ export default makeScene2D(function* (view) {
     ),
 
     chain(
-      waitFor(0.18),
+      waitFor(0.16),
 
       all(
         dataSheet().opacity(
@@ -1298,14 +1256,14 @@ export default makeScene2D(function* (view) {
 
         dataSheet().scale(
           1,
-          0.55,
+          0.42,
           easeOutCubic,
         ),
       ),
     ),
   );
 
-  yield* waitFor(0.40);
+  yield* waitFor(0.25);
 
   /*
    * SPLIT LINES
@@ -1316,7 +1274,7 @@ export default makeScene2D(function* (view) {
       (ref, index) =>
         ref().y(
           dataLineSplitY[index],
-          0.60,
+          0.48,
           easeInOutCubic,
         ),
     ),
@@ -1327,14 +1285,14 @@ export default makeScene2D(function* (view) {
    */
 
   yield* sequence(
-    0.11,
+    0.09,
 
     ...insertedLineRefs.map(
       (ref, index) =>
         all(
           ref().opacity(
             1,
-            0.22,
+            0.26,
             easeOutCubic,
           ),
 
@@ -1344,20 +1302,20 @@ export default makeScene2D(function* (view) {
                 index
               ] /
                 2,
-            0.52,
+            0.44,
             easeInOutCubic,
           ),
 
           ref().scale(
             [1, 1],
-            0.52,
+            0.44,
             easeOutCubic,
           ),
         ),
     ),
   );
 
-  yield* waitFor(0.55);
+  yield* waitFor(0.30);
 
   /*
    * FAKE DATA → IMAGE.PNG
@@ -1366,7 +1324,7 @@ export default makeScene2D(function* (view) {
   yield* all(
     dataSheet().scale(
       0.22,
-      0.62,
+      0.45,
       easeInCubic,
     ),
 
@@ -1378,23 +1336,23 @@ export default makeScene2D(function* (view) {
 
     dataSheet().y(
       -15,
-      0.62,
+      0.52,
       easeInOutCubic,
     ),
 
     chain(
-      waitFor(0.18),
+      waitFor(0.15),
 
       all(
         fileIcon().opacity(
           1,
-          0.34,
+          0.30,
           easeOutCubic,
         ),
 
         fileIcon().scale(
           1,
-          0.46,
+          0.30,
           easeOutCubic,
         ),
       ),
@@ -1405,23 +1363,23 @@ export default makeScene2D(function* (view) {
    * CURSOR
    */
 
-  yield* waitFor(0.18);
+  yield* waitFor(0.12);
 
   yield* all(
     cursor().opacity(
       1,
-      0.15,
+      0.12,
       easeOutCubic,
     ),
 
     cursor().position(
       [48, -12],
-      0.52,
+      0.42,
       easeInOutCubic,
     ),
   );
 
-  yield* waitFor(0.12);
+  yield* waitFor(0.08);
 
   /*
    * CLICK
@@ -1451,29 +1409,29 @@ export default makeScene2D(function* (view) {
 
     clickRingA().scale(
       2.6,
-      0.30,
+      0.26,
       easeOutCubic,
     ),
 
     clickRingA().opacity(
       0,
-      0.30,
+      0.20,
       easeOutCubic,
     ),
 
     chain(
-      waitFor(0.035),
+      waitFor(0.03),
 
       all(
         clickRingB().scale(
           3.5,
-          0.35,
+          0.22,
           easeOutCubic,
         ),
 
         clickRingB().opacity(
           0,
-          0.35,
+          0.22,
           easeOutCubic,
         ),
       ),
@@ -1483,24 +1441,24 @@ export default makeScene2D(function* (view) {
   yield* all(
     cursor().scale(
       0.78,
-      0.09,
+      0.08,
       easeOutCubic,
     ),
 
     cursor().y(
       -12,
-      0.09,
+      0.06,
       easeOutCubic,
     ),
 
     fileIcon().scale(
       1,
-      0.09,
+      0.06,
       easeOutCubic,
     ),
   );
 
-  yield* waitFor(0.07);
+  yield* waitFor(0.04);
 
   /*
    * OPEN VIEWER
@@ -1509,31 +1467,31 @@ export default makeScene2D(function* (view) {
   yield* all(
     cursor().opacity(
       0,
-      0.16,
+      0.12,
       easeInCubic,
     ),
 
     fileIcon().opacity(
       0,
-      0.38,
+      0.28,
       easeInCubic,
     ),
 
     fileIcon().scale(
       0.76,
-      0.46,
+      0.38,
       easeInCubic,
     ),
 
     programWindow().opacity(
       1,
-      0.42,
+      0.28,
       easeOutCubic,
     ),
 
     programWindow().scale(
       1,
-      0.62,
+      0.45,
       easeOutCubic,
     ),
   );
@@ -1549,23 +1507,53 @@ export default makeScene2D(function* (view) {
   yield* all(
     sky().opacity(
       1,
-      0.22,
+      0.15,
       easeOutCubic,
     ),
 
     chain(
-      waitFor(0.05),
+      waitFor(0.03),
 
       all(
         sun().opacity(
           1,
-          0.20,
+          0.14,
           easeOutCubic,
         ),
 
         sun().scale(
           1,
-          0.34,
+          0.22,
+          easeOutCubic,
+        ),
+      ),
+    ),
+
+    chain(
+      waitFor(0.06),
+
+      all(
+        cloudA().opacity(
+          1,
+          0.16,
+          easeOutCubic,
+        ),
+
+        cloudA().x(
+          -205,
+          0.16,
+          easeOutCubic,
+        ),
+
+        cloudB().opacity(
+          1,
+          0.16,
+          easeOutCubic,
+        ),
+
+        cloudB().x(
+          125,
+          0.16,
           easeOutCubic,
         ),
       ),
@@ -1575,120 +1563,90 @@ export default makeScene2D(function* (view) {
       waitFor(0.10),
 
       all(
-        cloudA().opacity(
-          1,
-          0.24,
-          easeOutCubic,
-        ),
-
-        cloudA().x(
-          -205,
-          0.38,
-          easeOutCubic,
-        ),
-
-        cloudB().opacity(
-          1,
-          0.24,
-          easeOutCubic,
-        ),
-
-        cloudB().x(
-          125,
-          0.38,
-          easeOutCubic,
-        ),
-      ),
-    ),
-
-    chain(
-      waitFor(0.14),
-
-      all(
         farMountains().opacity(
           1,
-          0.24,
+          0.16,
           easeOutCubic,
         ),
 
         farMountains().y(
           0,
-          0.52,
+          0.30,
           easeOutCubic,
         ),
       ),
     ),
 
     chain(
-      waitFor(0.24),
+      waitFor(0.16),
 
       all(
         nearMountains().opacity(
           1,
-          0.24,
+          0.16,
           easeOutCubic,
         ),
 
         nearMountains().y(
           0,
-          0.52,
+          0.30,
           easeOutCubic,
         ),
       ),
     ),
 
     chain(
-      waitFor(0.31),
+      waitFor(0.22),
 
       lake().opacity(
         1,
-        0.35,
+        0.22,
         easeOutCubic,
       ),
     ),
 
     chain(
-      waitFor(0.36),
+      waitFor(0.27),
 
       all(
         leftShore().opacity(
           1,
-          0.25,
+          0.18,
           easeOutCubic,
         ),
 
         leftShore().y(
           0,
-          0.44,
+          0.28,
           easeOutCubic,
         ),
 
         rightShore().opacity(
           1,
-          0.25,
+          0.18,
           easeOutCubic,
         ),
 
         rightShore().y(
           0,
-          0.44,
+          0.28,
           easeOutCubic,
         ),
       ),
     ),
 
     chain(
-      waitFor(0.44),
+      waitFor(0.32),
 
       sequence(
-        0.045,
+        0.03,
 
         ...treeRefs.map(
           (ref, index) =>
             all(
               ref().opacity(
                 1,
-                0.17,
+                0.12,
                 easeOutCubic,
               ),
 
@@ -1702,7 +1660,7 @@ export default makeScene2D(function* (view) {
                   LANDSCAPE_X_INVERSE,
                   1,
                 ],
-                0.26,
+                0.18,
                 easeOutCubic,
               ),
 
@@ -1710,7 +1668,7 @@ export default makeScene2D(function* (view) {
                 treePositions[
                   index
                 ][1],
-                0.30,
+                0.20,
                 easeOutCubic,
               ),
             ),
@@ -1719,7 +1677,7 @@ export default makeScene2D(function* (view) {
     ),
   );
 
-  yield* waitFor(1.00);
+  yield* waitFor(0.85);
 
   /*
    * ---------------------------------------------------------
@@ -1730,97 +1688,97 @@ export default makeScene2D(function* (view) {
   yield* all(
     sun().opacity(
       0,
-      0.40,
+      0.30,
       easeInCubic,
     ),
 
     sun().scale(
       0.3,
-      0.44,
+      0.32,
       easeInCubic,
     ),
 
     cloudA().x(
       -280,
-      0.44,
+      0.32,
       easeInOutCubic,
     ),
 
     cloudA().opacity(
       0,
-      0.40,
+      0.30,
       easeInCubic,
     ),
 
     cloudB().x(
       205,
-      0.44,
+      0.32,
       easeInOutCubic,
     ),
 
     cloudB().opacity(
       0,
-      0.40,
+      0.30,
       easeInCubic,
     ),
 
     farMountains().x(
       -100,
-      0.46,
+      0.34,
       easeInOutCubic,
     ),
 
     farMountains().opacity(
       0,
-      0.44,
+      0.32,
       easeInCubic,
     ),
 
     nearMountains().x(
       110,
-      0.46,
+      0.34,
       easeInOutCubic,
     ),
 
     nearMountains().opacity(
       0,
-      0.44,
+      0.32,
       easeInCubic,
     ),
 
     lake().scale(
       [1, 0.2],
-      0.46,
+      0.34,
       easeInCubic,
     ),
 
     lake().opacity(
       0,
-      0.42,
+      0.38,
       easeInCubic,
     ),
 
     leftShore().x(
       -130,
-      0.46,
+      0.34,
       easeInOutCubic,
     ),
 
     leftShore().opacity(
       0,
-      0.42,
+      0.38,
       easeInCubic,
     ),
 
     rightShore().x(
       130,
-      0.46,
+      0.34,
       easeInOutCubic,
     ),
 
     rightShore().opacity(
       0,
-      0.42,
+      0.38,
       easeInCubic,
     ),
 
@@ -1836,7 +1794,7 @@ export default makeScene2D(function* (view) {
                   ? -70
                   : 70
               ),
-            0.40,
+            0.30,
             easeInOutCubic,
           ),
 
@@ -1844,7 +1802,7 @@ export default makeScene2D(function* (view) {
             index % 2 === 0
               ? -14
               : 14,
-            0.40,
+            0.30,
             easeInOutCubic,
           ),
 
@@ -1860,25 +1818,25 @@ export default makeScene2D(function* (view) {
 
           ref().opacity(
             0,
-            0.36,
+            0.28,
             easeInCubic,
           ),
         ),
     ),
 
     chain(
-      waitFor(0.08),
+      waitFor(0.04),
 
       all(
         programWindow().scale(
           [0.055, 1],
-          0.52,
+          0.40,
           easeInCubic,
         ),
 
         programWindow().rotation(
           -2,
-          0.52,
+          0.40,
           easeInOutCubic,
         ),
       ),
@@ -1923,13 +1881,13 @@ export default makeScene2D(function* (view) {
   yield* all(
     programWindow().scale(
       [1, 1],
-      0.72,
+      0.55,
       easeOutCubic,
     ),
 
     programWindow().rotation(
       0,
-      0.72,
+      0.55,
       easeOutCubic,
     ),
   );
@@ -1947,31 +1905,31 @@ export default makeScene2D(function* (view) {
   yield* all(
     programWindow().opacity(
       0,
-      0.58,
+      0.46,
       easeInCubic,
     ),
 
     programWindow().scale(
       0.72,
-      0.72,
+      0.60,
       easeInCubic,
     ),
 
     programWindow().y(
       -30,
-      0.72,
+      0.60,
       easeInOutCubic,
     ),
 
     doomArtwork().opacity(
       0,
-      0.42,
+      0.38,
       easeInCubic,
     ),
 
     doomFrame().opacity(
       0,
-      0.42,
+      0.38,
       easeInCubic,
     ),
   );
@@ -1986,22 +1944,22 @@ export default makeScene2D(function* (view) {
   yield* all(
     summary().opacity(
       1,
-      0.50,
+      0.38,
       easeOutCubic,
     ),
 
     summary().scale(
       1,
-      0.75,
+      0.55,
       easeOutCubic,
     ),
 
     summary().y(
       0,
-      0.75,
+      0.55,
       easeOutCubic,
     ),
   );
 
-  yield* waitFor(2.20);
+  yield* waitFor(1.95);
 });
