@@ -1219,7 +1219,7 @@ export default makeScene2D(function* (view) {
                 [-48, 11],
                 [-28, 30],
               ]}
-              stroke={COLORS.code}
+              stroke={COLORS.accent}
               lineWidth={9}
               lineCap={'round'}
               lineJoin={'round'}
@@ -1230,7 +1230,7 @@ export default makeScene2D(function* (view) {
                 [8, -8],
                 [-8, 30],
               ]}
-              stroke={COLORS.code}
+              stroke={COLORS.accent}
               lineWidth={9}
               lineCap={'round'}
             />
@@ -1241,7 +1241,7 @@ export default makeScene2D(function* (view) {
                 [48, 11],
                 [28, 30],
               ]}
-              stroke={COLORS.code}
+              stroke={COLORS.accent}
               lineWidth={9}
               lineCap={'round'}
               lineJoin={'round'}
