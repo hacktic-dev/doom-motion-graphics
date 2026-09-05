@@ -313,10 +313,10 @@ export default makeScene2D(function* (view) {
     chain(waitFor(0.14), doomArtwork().opacity(1, 0.51, easeOutCubic)),
   );
 
-  // 3.00–6.25: allow the running program to register.
-  yield* waitFor(3.25);
+  // 3.00–5.75: allow the running program to register.
+  yield* waitFor(2.75);
 
-  // 6.25–7.05: collapse the whole browser back into doom.html.
+  // 5.75–6.55: collapse the whole browser back into doom.html.
   yield* all(
     doomArtwork().opacity(0, 0.28, easeInCubic),
     browser().opacity(0, 0.42, easeInCubic),
@@ -331,72 +331,72 @@ export default makeScene2D(function* (view) {
   );
   doomArtwork().pause();
 
-  // 7.05–9.00: hold on the single packaged file.
-  yield* waitFor(1.95);
+  // 6.55–10.25: hold on the single packaged file.
+  yield* waitFor(3.70);
 
-  // 9.00–9.70: make room and introduce image.png as the second input.
+  // 10.25–10.78: make room and introduce image.png as the second input.
   yield* all(
-    htmlFile().position([350, -80], 0.62, easeInOutCubic),
-    pngFile().x(-350, 0.62, easeInOutCubic),
-    pngFile().opacity(1, 0.34, easeOutCubic),
-    pngFile().scale(1, 0.62, easeOutCubic),
+    htmlFile().position([350, -80], 0.465, easeInOutCubic),
+    pngFile().x(-350, 0.465, easeInOutCubic),
+    pngFile().opacity(1, 0.255, easeOutCubic),
+    pngFile().scale(1, 0.465, easeOutCubic),
   );
-  yield* waitFor(0.08);
+  yield* waitFor(0.06);
 
-  // 9.70–11.20: hold on the two ingredients without reducing them to a
+  // 10.78–11.90: hold on the two ingredients without reducing them to a
   // conventional plus-sign equation.
-  yield* waitFor(1.50);
+  yield* waitFor(1.125);
 
-  // 11.20–12.55: both files release visible data strands toward the centre.
+  // 11.90–12.91: both files release visible data strands toward the centre.
   // As the braid completes, the sources dissolve and one larger file forms.
   yield* all(
-    pngFile().position([-245, -55], 0.72, easeInOutCubic),
-    pngFile().rotation(7, 0.72, easeInOutCubic),
-    htmlFile().position([245, -55], 0.72, easeInOutCubic),
-    htmlFile().rotation(-7, 0.72, easeInOutCubic),
+    pngFile().position([-245, -55], 0.54, easeInOutCubic),
+    pngFile().rotation(7, 0.54, easeInOutCubic),
+    htmlFile().position([245, -55], 0.54, easeInOutCubic),
+    htmlFile().rotation(-7, 0.54, easeInOutCubic),
     chain(
-      waitFor(0.05),
+      waitFor(0.0375),
       sequence(
-        0.07,
+        0.0525,
         ...braidRefs.map(ref => all(
           ref().opacity(1, 0),
-          ref().end(1, 0.72, easeInOutCubic),
+          ref().end(1, 0.54, easeInOutCubic),
         )),
       ),
     ),
     chain(
-      waitFor(0.62),
+      waitFor(0.465),
       all(
-        pngFile().opacity(0, 0.50, easeInCubic),
-        pngFile().scale(0.28, 0.50, easeInCubic),
-        htmlFile().opacity(0, 0.50, easeInCubic),
-        htmlFile().scale(0.28, 0.50, easeInCubic),
+        pngFile().opacity(0, 0.375, easeInCubic),
+        pngFile().scale(0.28, 0.375, easeInCubic),
+        htmlFile().opacity(0, 0.375, easeInCubic),
+        htmlFile().scale(0.28, 0.375, easeInCubic),
       ),
     ),
     chain(
-      waitFor(0.68),
+      waitFor(0.51),
       all(
-        destination().opacity(1, 0.32, easeOutCubic),
-        destination().scale(1.20, 0.52, easeOutCubic),
+        destination().opacity(1, 0.24, easeOutCubic),
+        destination().scale(1.20, 0.39, easeOutCubic),
       ),
     ),
     chain(
-      waitFor(0.82),
+      waitFor(0.615),
       sequence(
-        0.05,
+        0.0375,
         ...fusionBarRefs.map(ref => all(
-          ref().opacity(1, 0.18, easeOutCubic),
-          ref().scale([1, 1], 0.28, easeOutCubic),
+          ref().opacity(1, 0.135, easeOutCubic),
+          ref().scale([1, 1], 0.21, easeOutCubic),
         )),
       ),
     ),
     chain(
-      waitFor(1.00),
-      all(...braidRefs.map(ref => ref().opacity(0, 0.20, easeInCubic))),
+      waitFor(0.75),
+      all(...braidRefs.map(ref => ref().opacity(0, 0.15, easeInCubic))),
     ),
   );
-  yield* waitFor(0.65);
+  yield* waitFor(0.4875);
 
-  // 12.55–14.00: hold the larger combined file for the Scene 6 handoff.
-  yield* waitFor(0.80);
+  // 13.40–14.00: hold the larger combined file for the Scene 6 handoff.
+  yield* waitFor(0.60);
 });
