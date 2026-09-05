@@ -232,8 +232,6 @@ export default makeScene2D(function* (view) {
             fill={color}
             stroke={COLORS.borderStrong}
             lineWidth={5}
-            shadowColor={COLORS.shadowSoft}
-            shadowBlur={14}
             opacity={0}
             scale={0.2}
             zIndex={4}
@@ -383,9 +381,6 @@ export default makeScene2D(function* (view) {
                 fill={COLORS.card}
                 stroke={COLORS.borderStrong}
                 lineWidth={5}
-                shadowColor={COLORS.shadowSoft}
-                shadowBlur={18}
-                shadowOffsetY={8}
               >
                 <Txt
                   ref={endingByteRefs[index]}

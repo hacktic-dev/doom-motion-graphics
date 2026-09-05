@@ -74,7 +74,7 @@ function PreviousSceneState({
     <Node>
       <Node ref={byteRowRef} y={-155}>
         {rawBytes.map((byte, index) => (
-          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={4} shadowColor={COLORS.shadowSoft} shadowBlur={16} shadowOffsetY={7}>
+          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={4}>
             <Txt ref={byteTextRefs[index]} text={byte} fill={COLORS.text} fontSize={46} fontFamily={'monospace'} fontWeight={700} />
           </Rect>
         ))}

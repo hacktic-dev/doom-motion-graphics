@@ -283,9 +283,6 @@ export default makeScene2D(function* (view) {
               fill={COLORS.card}
               stroke={COLORS.borderStrong}
               lineWidth={5}
-              shadowColor={COLORS.shadow}
-              shadowBlur={22}
-              shadowOffsetY={10}
             >
               <Txt
                 ref={openingByteRefs[index]}
@@ -519,12 +516,6 @@ export default makeScene2D(function* (view) {
           stroke={COLORS.cursorStroke}
           lineWidth={2.8}
           lineJoin={'round'}
-          shadowColor={
-            COLORS.shadowSoft
-          }
-          shadowBlur={7}
-          shadowOffsetX={2}
-          shadowOffsetY={3}
         />
       </Node>
 
@@ -645,11 +636,6 @@ export default makeScene2D(function* (view) {
             fill={'#dceefa'}
             stroke={COLORS.border}
             lineWidth={3}
-            shadowColor={
-              'rgba(0,0,0,0.08)'
-            }
-            shadowBlur={10}
-            shadowOffsetY={4}
             clip
           >
             {/*

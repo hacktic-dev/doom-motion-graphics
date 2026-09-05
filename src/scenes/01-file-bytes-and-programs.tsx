@@ -102,6 +102,9 @@ export default makeScene2D(function* (view) {
             stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
 
           <Line
