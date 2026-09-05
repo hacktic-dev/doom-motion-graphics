@@ -1,10 +1,15 @@
 import {makeProject} from '@motion-canvas/core';
 
-import pngToBytes from './scenes/01-png-to-bytes?scene';
-import continuation from './scenes/02-continuation?scene';
-import nextSection from './scenes/03-continuation?scene';
-import polyglot from './scenes/04-continuation?scene';
+import fileBytesAndPrograms from './scenes/01-file-bytes-and-programs?scene';
+import reconstructingPngData from './scenes/02-reconstructing-png-data?scene';
+import rawBytesAsText from './scenes/03-raw-bytes-as-text?scene';
+import polyglotFileInterpretations from './scenes/04-polyglot-file-interpretations?scene';
 
 export default makeProject({
-  scenes: [pngToBytes, continuation, nextSection, polyglot],
+  scenes: [
+    fileBytesAndPrograms,
+    reconstructingPngData,
+    rawBytesAsText,
+    polyglotFileInterpretations,
+  ],
 });
