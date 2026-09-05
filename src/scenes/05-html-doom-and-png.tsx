@@ -163,9 +163,9 @@ export default makeScene2D(function* (view) {
           clip
         >
           <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={TITLEBAR_Y} fill={COLORS.titlebar} />
-          <Circle width={17} height={17} x={-590} y={TITLEBAR_Y} fill={'#ff5f57'} />
-          <Circle width={17} height={17} x={-560} y={TITLEBAR_Y} fill={'#febc2e'} />
-          <Circle width={17} height={17} x={-530} y={TITLEBAR_Y} fill={'#28c840'} />
+          <Circle width={17} height={17} x={-580} y={TITLEBAR_Y} fill={'#ff5f57'} />
+          <Circle width={17} height={17} x={-550} y={TITLEBAR_Y} fill={'#febc2e'} />
+          <Circle width={17} height={17} x={-520} y={TITLEBAR_Y} fill={'#28c840'} />
           <Rect width={820} height={36} y={TITLEBAR_Y} radius={9} fill={COLORS.panel} />
           <Txt
             text={'doom.html'}
