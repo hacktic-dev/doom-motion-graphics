@@ -27,16 +27,17 @@ const COLORS = {
   titleText: '#C4CBDA',
   shadow: 'rgba(0,0,0,0.24)',
 
-  paper: '#F4EEE4',
-  paperDark: '#E8DCCB',
-  paperSlip: '#FBF7F0',
-  paperLine: '#D3C2AA',
-  ink: '#5A4B3F',
-  inkSoft: '#7B6B5D',
-  tape: '#E6D4A6',
+  paper: '#3A3E52',
+  paperDark: '#2B2E3B',
+  paperSlip: '#454A60',
+  paperLine: '#646B82',
+  ink: '#F4F6FA',
+  inkSoft: '#AEB5C6',
+  tape: '#8C7CFF',
 
   accent: '#8C7CFF',
   purple: '#A996FF',
+  orange: '#F09A57',
 };
 
 const IMAGE_VIEW_WIDTH = 720;
@@ -345,7 +346,7 @@ function MetadataSlip({
   rotation?: number;
 }) {
   return (
-    <Node x={x} y={y} rotation={rotation}>
+    <Node x={x} y={y} rotation={rotation * 0}>
       <Rect
         width={width}
         height={72}
@@ -353,14 +354,17 @@ function MetadataSlip({
         fill={COLORS.paperSlip}
         stroke={COLORS.paperLine}
         lineWidth={2}
+        shadowColor={'rgba(0,0,0,0.18)'}
+        shadowBlur={12}
+        shadowOffsetY={5}
       />
 
       <Txt
         text={text}
         fill={COLORS.ink}
-        fontFamily={'Segoe Print'}
-        fontSize={24}
-        fontWeight={400}
+        fontFamily={'monospace'}
+        fontSize={22}
+        fontWeight={600}
       />
     </Node>
   );
@@ -504,8 +508,8 @@ export default makeScene2D(function* (view) {
           <Rect
             ref={photoFrame}
             width={770}
-            height={610}
-            y={30}
+            height={530}
+            y={0}
             radius={22}
             fill={COLORS.paper}
             shadowColor={'rgba(0,0,0,0.30)'}
@@ -535,8 +539,8 @@ export default makeScene2D(function* (view) {
         >
           <Rect
             width={770}
-            height={610}
-            y={30}
+            height={530}
+            y={0}
             radius={22}
             fill={COLORS.paper}
             shadowColor={'rgba(0,0,0,0.30)'}
@@ -545,9 +549,9 @@ export default makeScene2D(function* (view) {
           />
 
           <Rect
-            width={690}
-            height={500}
-            y={10}
+            width={720}
+            height={480}
+            y={0}
             radius={18}
             fill={COLORS.paperDark}
             stroke={COLORS.paperLine}
@@ -556,95 +560,93 @@ export default makeScene2D(function* (view) {
 
           <Node
             ref={noteTag}
-            x={-250}
-            y={-205}
+            x={-277}
+            y={-191}
           >
+            <Rect
+              width={116}
+              height={48}
+              radius={20}
+              fill={COLORS.orange}
+              shadowColor={'rgba(0,0,0,0.18)'}
+              shadowBlur={10}
+              shadowOffsetY={4}
+            />
             <Txt
               text={'tEXt'}
-              fill={COLORS.ink}
-              fontFamily={'Segoe Print'}
-              fontSize={30}
-            />
-
-            <Line
-              points={[
-                [-34, 16],
-                [34, 16],
-              ]}
-              stroke={COLORS.inkSoft}
-              lineWidth={2}
-              lineCap={'round'}
+              fill={COLORS.background}
+              fontFamily={'monospace'}
+              fontWeight={700}
+              fontSize={25}
             />
           </Node>
 
           <Node
             ref={noteAuthor}
-            x={-176}
-            y={-105}
-            rotation={-2}
+            x={0}
+            y={-100}
           >
             <MetadataSlip
-              width={240}
+              width={440}
               text={'Author: hacktic'}
             />
           </Node>
 
           <Node
             ref={noteComment}
-            x={140}
-            y={-2}
-            rotation={1.4}
+            x={0}
+            y={-15}
           >
             <MetadataSlip
-              width={350}
+              width={440}
               text={'Comment: Mountain Image'}
             />
           </Node>
 
           <Node
             ref={noteSoftware}
-            x={-150}
-            y={104}
-            rotation={-1}
+            x={0}
+            y={70}
           >
             <MetadataSlip
-              width={300}
+              width={440}
               text={'Software: PNG Viewer'}
             />
           </Node>
 
           <Rect
             ref={hiddenArea}
-            width={398}
-            height={172}
-            y={38}
+            width={300}
+            height={220}
+            x={175}
+            y={0}
             radius={22}
-            fill={'#EFE4D6'}
-            stroke={'#D2C0A7'}
+            fill={COLORS.paperDark}
+            stroke={COLORS.accent}
             lineWidth={2}
             opacity={0}
           />
 
           <Rect
             ref={tapeLeft}
-            width={86}
-            height={20}
-            x={-126}
-            y={-56}
-            rotation={-14}
-            radius={6}
+            width={72}
+            height={9}
+            x={100}
+            y={-106}
+            rotation={0}
+            radius={5}
             fill={COLORS.tape}
             opacity={0}
           />
 
           <Rect
             ref={tapeRight}
-            width={86}
-            height={20}
-            x={124}
-            y={-56}
-            rotation={14}
-            radius={6}
+            width={72}
+            height={9}
+            x={250}
+            y={-106}
+            rotation={0}
+            radius={5}
             fill={COLORS.tape}
             opacity={0}
           />
@@ -743,7 +745,7 @@ export default makeScene2D(function* (view) {
     ),
 
     photoImage().y(
-      -18,
+      0,
       0.72,
       easeInOutCubic,
     ),
@@ -830,25 +832,43 @@ export default makeScene2D(function* (view) {
   // Clear space for hidden HTML.
   yield* all(
     noteAuthor().position(
-      [-220, -126],
+      [-175, -62],
+      0.54,
+      easeInOutCubic,
+    ),
+
+    noteAuthor().scale(
+      0.68,
       0.54,
       easeInOutCubic,
     ),
 
     noteComment().position(
-      [156, -145],
+      [-175, 0],
+      0.54,
+      easeInOutCubic,
+    ),
+
+    noteComment().scale(
+      0.68,
       0.54,
       easeInOutCubic,
     ),
 
     noteSoftware().position(
-      [-162, 182],
+      [-175, 62],
+      0.54,
+      easeInOutCubic,
+    ),
+
+    noteSoftware().scale(
+      0.68,
       0.54,
       easeInOutCubic,
     ),
 
     noteTag().position(
-      [-256, -212],
+      [-277, -191],
       0.54,
       easeInOutCubic,
     ),
@@ -883,7 +903,7 @@ export default makeScene2D(function* (view) {
         easeOutCubic,
       ),
       stripA().position(
-        [-58, -5],
+        [150, -60],
         0.58,
         easeInOutCubic,
       ),
@@ -901,7 +921,7 @@ export default makeScene2D(function* (view) {
         easeOutCubic,
       ),
       stripB().position(
-        [10, 25],
+        [190, -20],
         0.58,
         easeInOutCubic,
       ),
@@ -919,7 +939,7 @@ export default makeScene2D(function* (view) {
         easeOutCubic,
       ),
       stripC().position(
-        [-26, 55],
+        [160, 20],
         0.58,
         easeInOutCubic,
       ),
@@ -937,7 +957,7 @@ export default makeScene2D(function* (view) {
         easeOutCubic,
       ),
       stripD().position(
-        [26, 85],
+        [185, 60],
         0.58,
         easeInOutCubic,
       ),

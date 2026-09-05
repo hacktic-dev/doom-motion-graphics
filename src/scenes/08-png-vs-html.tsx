@@ -477,10 +477,10 @@ export default makeScene2D(function* (view) {
       <Node ref={photo} x={0} y={18} scale={PHOTO_START_SCALE} zIndex={10}>
         <Rect
           width={770}
-          height={610}
-          y={30}
+          height={530}
+          y={0}
           radius={22}
-          fill={COLORS.paper}
+          fill={'#3A3E52'}
           shadowColor={'rgba(0,0,0,0.30)'}
           shadowBlur={26}
           shadowOffsetY={14}
@@ -488,7 +488,7 @@ export default makeScene2D(function* (view) {
         <Rect
           width={720}
           height={480}
-          y={-18}
+          y={0}
           radius={12}
           fill={'rgba(0,0,0,0)'}
           clip
