@@ -68,7 +68,7 @@ const landscapeTreePositions = [
   [318, 132],
 ] as const;
 
-function Scene4Landscape() {
+export function Scene4Landscape() {
   return (
     <Node scale={LANDSCAPE_UNIFORM_SCALE}>
       <Node scale={[LANDSCAPE_X_SCALE, 1]}>

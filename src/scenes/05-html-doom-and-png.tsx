@@ -133,6 +133,7 @@ export default makeScene2D(function* (view) {
   const fusionBarRefs = Array.from({length: 6}, () => createRef<Rect>());
   const browserTag = createRef<Node>();
   const playButton = createRef<Node>();
+  const loadingFill = createRef<Rect>();
 
   view.add(
     <Rect width={'100%'} height={'100%'} fill={COLORS.background} zIndex={-100} />,
@@ -183,20 +184,24 @@ export default makeScene2D(function* (view) {
             </Node>
 
             <Node ref={playButton} y={112} opacity={0} scale={0.25}>
-              <Circle
-                width={104}
-                height={104}
-                fill={COLORS.accent}
-                shadowColor={'rgba(140,124,255,0.30)'}
-                shadowBlur={20}
-              />
-              <Line
-                points={[[-13, -24], [31, 0], [-13, 24]]}
-                closed
-                fill={COLORS.text}
-                stroke={COLORS.text}
-                lineWidth={3}
-              />
+              <Rect
+                width={300}
+                height={22}
+                radius={11}
+                fill={'rgba(255,255,255,0.12)'}
+                shadowColor={'rgba(140,124,255,0.24)'}
+                shadowBlur={14}
+              >
+                <Rect
+                  ref={loadingFill}
+                  width={0}
+                  height={22}
+                  x={-150}
+                  offset={[-1, 0]}
+                  radius={11}
+                  fill={COLORS.accent}
+                />
+              </Rect>
             </Node>
             <Video
               ref={doomArtwork}
@@ -295,7 +300,7 @@ export default makeScene2D(function* (view) {
     browser().scale([1, 1], 0.80, easeInOutCubic),
   );
 
-  // 2.00–2.35: the retained code mark becomes an executable play control.
+  // 2.00–2.35: the retained code mark becomes a loading game canvas.
   yield* all(
     browserTag().y(-72, 0.35, easeInOutCubic),
     browserTag().scale(1.55, 0.35, easeInOutCubic),
@@ -303,15 +308,12 @@ export default makeScene2D(function* (view) {
     playButton().scale(1, 0.35, easeOutCubic),
   );
 
-  // 2.35–3.00: pressing play replaces the HTML mark with the running program.
+  // 2.35–3.00: the page finishes initializing, then reveals the program.
   doomArtwork().seek(16);
   doomArtwork().play();
   yield* all(
-    chain(
-      playButton().scale(0.82, 0.10, easeInCubic),
-      playButton().scale(1.12, 0.12, easeOutCubic),
-      playButton().opacity(0, 0.20, easeInCubic),
-    ),
+    loadingFill().width(300, 0.30, easeInOutCubic),
+    chain(waitFor(0.28), playButton().opacity(0, 0.20, easeInCubic)),
     browserTag().opacity(0, 0.30, easeInCubic),
     chain(waitFor(0.14), doomArtwork().opacity(1, 0.51, easeOutCubic)),
   );

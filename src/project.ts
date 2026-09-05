@@ -8,6 +8,8 @@ import polyglotFileInterpretations from './scenes/04-polyglot-file-interpretatio
 import htmlDoomAndPng from './scenes/05-html-doom-and-png?scene';
 import pngChunks from './scenes/06-png-chunks?scene';
 import pngMetadata from './scenes/07-png-metadata?scene';
+import pngVsHtml from './scenes/08-png-vs-html?scene';
+import browserReinterpretsBytes from './scenes/09-browser-reinterprets-bytes?scene';
 
 export default makeProject({
   scenes: [
@@ -17,7 +19,9 @@ export default makeProject({
     rawBytesAsText,
     polyglotFileInterpretations,
     htmlDoomAndPng,
-	pngChunks,
-	pngMetadata,
+    pngChunks,
+    pngMetadata,
+    pngVsHtml,
+    browserReinterpretsBytes,
   ],
 });
