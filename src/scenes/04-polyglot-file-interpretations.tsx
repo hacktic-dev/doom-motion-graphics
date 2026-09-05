@@ -168,7 +168,10 @@ const DOOM_ZOOM_START = 1.004;
 const DOOM_ZOOM_END = 1.045;
 const DOOM_ZOOM_DURATION = 2.10;
 const DOOM_HOLD_BEFORE_FADE = 0.90;
-const EMPTY_GAP_BEFORE_SUMMARY = 3.01;
+const POLYGLOT_TITLE = 'Polyglot';
+const POLYGLOT_PILL_WIDTH = 500;
+const POLYGLOT_PILL_HEIGHT = 94;
+const POLYGLOT_PILL_COLLAPSED_WIDTH = 22;
 
 export default makeScene2D(function* (view) {
   /*
@@ -241,7 +244,8 @@ export default makeScene2D(function* (view) {
   const doomFrame = createRef<Rect>();
   const doomArtwork = createRef<Img>();
 
-
+  const polyglotPill = createRef<Rect>();
+  const polyglotTitle = createRef<Txt>();
   const summary = createRef<Node>();
 
   /*
@@ -1011,6 +1015,33 @@ export default makeScene2D(function* (view) {
           lineWidth={3}
         />
       </Node>
+
+      {/* Polyglot chapter title, matching the Scene 0 title treatment. */}
+      <Rect
+        ref={polyglotPill}
+        width={POLYGLOT_PILL_COLLAPSED_WIDTH}
+        height={POLYGLOT_PILL_HEIGHT}
+        y={-315}
+        radius={16}
+        fill={COLORS.card}
+        shadowColor={COLORS.shadowSoft}
+        shadowBlur={22}
+        shadowOffsetY={10}
+        opacity={0}
+        clip
+        zIndex={10}
+      >
+        <Txt
+          ref={polyglotTitle}
+          text={''}
+          fill={COLORS.text}
+          fontSize={58}
+          fontFamily={'Courier New'}
+          fontWeight={700}
+          textAlign={'center'}
+          width={POLYGLOT_PILL_WIDTH - 70}
+        />
+      </Rect>
 
       {/*
        * -------------------------------------------------------
@@ -1956,11 +1987,28 @@ export default makeScene2D(function* (view) {
     ),
   );
 
-  yield* waitFor(EMPTY_GAP_BEFORE_SUMMARY);
+  // Give the empty frame a short breath after Doom disappears.
+  yield* waitFor(0.28);
+
+  // Reveal the Polyglot title using the same horizontal pill animation as
+  // the opening title scene.
+  polyglotPill().opacity(1);
+  yield* polyglotPill().width(
+    POLYGLOT_PILL_WIDTH,
+    0.60,
+    easeInOutCubic,
+  );
+
+  yield* waitFor(0.18);
+
+  const polyglotTimePerCharacter = 1.20 / POLYGLOT_TITLE.length;
+  for (let index = 0; index < POLYGLOT_TITLE.length; index++) {
+    polyglotTitle().text(POLYGLOT_TITLE.slice(0, index + 1));
+    yield* waitFor(polyglotTimePerCharacter);
+  }
 
   /*
-   * Bring in the clean file-format summary graphic.
-   * No POLYGLOT text here.
+   * Bring in the linked-file summary as soon as the title finishes typing.
    */
 
   yield* all(
@@ -1984,4 +2032,22 @@ export default makeScene2D(function* (view) {
   );
 
   yield* waitFor(1.95);
+
+  // Close the section by collapsing the title and dismissing the three-file
+  // graphic together.
+  yield* all(
+    chain(
+      polyglotPill().width(
+        POLYGLOT_PILL_COLLAPSED_WIDTH,
+        0.58,
+        easeInOutCubic,
+      ),
+      polyglotPill().opacity(0, 0.12, easeInCubic),
+    ),
+    summary().opacity(0, 0.42, easeInCubic),
+    summary().scale(0.76, 0.55, easeInCubic),
+    summary().y(24, 0.55, easeInOutCubic),
+  );
+
+  yield* waitFor(0.20);
 });
