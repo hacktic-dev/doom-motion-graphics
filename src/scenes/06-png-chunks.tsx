@@ -17,7 +17,6 @@ import {
   waitFor,
 } from '@motion-canvas/core';
 
-import {PngPreview} from '../components/PngPreview';
 
 const COLORS = {
   background: '#21232E',
@@ -43,6 +42,199 @@ const CHUNKS = [
   {name: 'IDAT', color: COLORS.green, x: 0, y: 250},
   {name: 'IEND', color: COLORS.yellow, x: 600, y: 250},
 ] as const;
+
+const IMAGE_VIEW_WIDTH = 720;
+const IMAGE_VIEW_HEIGHT = 480;
+const IMAGE_CARD_SCALE = 0.86;
+const LANDSCAPE_BASE_SIZE = 720;
+const LANDSCAPE_UNIFORM_SCALE = IMAGE_VIEW_HEIGHT / LANDSCAPE_BASE_SIZE;
+const LANDSCAPE_X_SCALE = IMAGE_VIEW_WIDTH / IMAGE_VIEW_HEIGHT;
+const LANDSCAPE_X_INVERSE = 1 / LANDSCAPE_X_SCALE;
+
+const landscapeTreePositions = [
+  [-304, 148],
+  [-252, 128],
+  [-195, 161],
+  [-142, 145],
+  [155, 148],
+  [212, 124],
+  [270, 156],
+  [318, 132],
+] as const;
+
+
+function Scene4Landscape() {
+  return (
+    <Node scale={LANDSCAPE_UNIFORM_SCALE}>
+      <Node scale={[LANDSCAPE_X_SCALE, 1]}>
+        <Rect
+          width={720}
+          height={720}
+          fill={'#dceefa'}
+        />
+
+        {/* Sun — same position/colour as Scene 4. */}
+        <Node
+          x={238}
+          y={-235}
+          scale={[LANDSCAPE_X_INVERSE, 1]}
+        >
+          <Circle
+            width={92}
+            height={92}
+            fill={'#f2ca59'}
+          />
+        </Node>
+
+        {/* Left cloud. */}
+        <Node
+          x={-205}
+          y={-220}
+          scale={[LANDSCAPE_X_INVERSE, 1]}
+        >
+          <Circle width={58} height={38} x={-30} fill={'#ffffff'} />
+          <Circle width={72} height={54} x={5} y={-7} fill={'#ffffff'} />
+          <Circle width={50} height={34} x={42} y={3} fill={'#ffffff'} />
+          <Rect width={115} height={25} y={8} radius={13} fill={'#ffffff'} />
+        </Node>
+
+        {/* Right cloud. */}
+        <Node
+          x={125}
+          y={-175}
+          scale={[LANDSCAPE_X_INVERSE, 1]}
+        >
+          <Circle width={44} height={30} x={-22} fill={'#ffffff'} />
+          <Circle width={58} height={44} x={8} y={-6} fill={'#ffffff'} />
+          <Circle width={40} height={28} x={37} y={3} fill={'#ffffff'} />
+          <Rect width={92} height={21} y={7} radius={11} fill={'#ffffff'} />
+        </Node>
+
+        {/* Far mountain range from Scene 4. */}
+        <Line
+          points={[
+            [-360, 108],
+            [-310, 58],
+            [-266, 88],
+            [-205, 14],
+            [-145, 83],
+            [-90, 38],
+            [-30, 102],
+            [35, 51],
+            [96, 100],
+            [161, 18],
+            [224, 91],
+            [280, 48],
+            [330, 95],
+            [360, 70],
+            [360, 144],
+            [-360, 144],
+          ]}
+          closed
+          fill={'#7f9fc2'}
+        />
+
+        {/* Near mountain range from Scene 4. */}
+        <Line
+          points={[
+            [-360, 150],
+            [-300, 91],
+            [-250, 132],
+            [-185, 54],
+            [-118, 137],
+            [-48, 74],
+            [16, 145],
+            [87, 79],
+            [148, 136],
+            [218, 65],
+            [282, 140],
+            [330, 105],
+            [360, 127],
+            [360, 179],
+            [-360, 179],
+          ]}
+          closed
+          fill={'#456f98'}
+        />
+
+        {/* Lake. */}
+        <Rect
+          width={720}
+          height={250}
+          y={235}
+          fill={'#72b7da'}
+        />
+
+        {/* Left shore. */}
+        <Line
+          points={[
+            [-360, 131],
+            [-292, 117],
+            [-225, 126],
+            [-162, 149],
+            [-100, 182],
+            [-42, 226],
+            [-92, 360],
+            [-360, 360],
+          ]}
+          closed
+          fill={'#5d8d5a'}
+        />
+
+        {/* Right shore. */}
+        <Line
+          points={[
+            [360, 127],
+            [296, 113],
+            [231, 125],
+            [174, 151],
+            [111, 185],
+            [44, 225],
+            [95, 360],
+            [360, 360],
+          ]}
+          closed
+          fill={'#608f5c'}
+        />
+
+        {/* Same tree positions and shapes as Scene 4. */}
+        {landscapeTreePositions.map(([x, y], index) => (
+          <Node
+            key={`viewer-tree-${index}`}
+            x={x}
+            y={y}
+            scale={[LANDSCAPE_X_INVERSE, 1]}
+          >
+            <Rect
+              width={9}
+              height={34}
+              y={19}
+              fill={'#65503e'}
+            />
+            <Line
+              points={[
+                [0, -52],
+                [29, 12],
+                [-29, 12],
+              ]}
+              closed
+              fill={index % 2 === 0 ? '#2d6857' : '#34735e'}
+            />
+            <Line
+              points={[
+                [0, -23],
+                [35, 36],
+                [-35, 36],
+              ]}
+              closed
+              fill={index % 2 === 0 ? '#285f50' : '#306a58'}
+            />
+          </Node>
+        ))}
+      </Node>
+    </Node>
+  );
+}
 
 function FileShape() {
   return (
@@ -295,18 +487,12 @@ export default makeScene2D(function* (view) {
   const imageChunkA = createRef<Node>();
   const imageChunkB = createRef<Node>();
   const imageCard = createRef<Node>();
-  const pngPreview = createRef<Node>();
+  const landscapePreview = createRef<Node>();
 
-  const PIXEL_COLS = 14;
-  const PIXEL_ROWS = 10;
+  const PIXEL_COLS = 17;
+  const PIXEL_ROWS = 11;
   const PIXEL_COUNT = PIXEL_COLS * PIXEL_ROWS;
   const pixelRefs = Array.from({length: PIXEL_COUNT}, () => createRef<Rect>());
-
-  // Placeholder metadata section restored with the same timing as the earlier version.
-  const metadataStage = createRef<Node>();
-  const metadataChipRefs = Array.from({length: 4}, () => createRef<Node>());
-  const metaChunkA = createRef<Node>();
-  const metaChunkB = createRef<Node>();
 
   view.add(
     <Rect width={'100%'} height={'100%'} fill={COLORS.background} zIndex={-100} />,
@@ -480,7 +666,7 @@ export default makeScene2D(function* (view) {
           <ImageDataChunkCard />
         </Node>
 
-        <Node ref={imageCard} x={360} y={0} opacity={0} scale={0.82}>
+        <Node ref={imageCard} x={360} y={0} opacity={0} scale={IMAGE_CARD_SCALE}>
           {/* A real image-viewer style window, matching the visual language of the earlier windows. */}
           <Rect
             width={800}
@@ -511,20 +697,20 @@ export default makeScene2D(function* (view) {
               fontSize={24}
             />
 
+            {/* No visible inner panel: pixels and final image sit directly on the
+                normal darker viewer background. */}
             <Rect
-              width={650}
-              height={430}
-              y={30}
-              radius={28}
-              fill={COLORS.background}
-              stroke={COLORS.panel}
-              lineWidth={3}
-            />
-
-            {/* Same visual footprint as the completed 14x10 pixel grid. */}
-            <Node ref={pngPreview} y={30} opacity={0} scale={3.65}>
-              <PngPreview />
-            </Node>
+              width={IMAGE_VIEW_WIDTH}
+              height={IMAGE_VIEW_HEIGHT}
+              y={36}
+              radius={24}
+              fill={'rgba(0,0,0,0)'}
+              clip
+            >
+              <Node ref={landscapePreview} opacity={0}>
+                <Scene4Landscape />
+              </Node>
+            </Rect>
           </Rect>
         </Node>
 
@@ -540,9 +726,9 @@ export default makeScene2D(function* (view) {
               key={`pixel-${index}`}
               x={sourceX}
               y={sourceY}
-              width={30}
-              height={30}
-              radius={6}
+              width={34}
+              height={34}
+              radius={7}
               fill={[
                 COLORS.blue,
                 COLORS.green,
@@ -558,70 +744,7 @@ export default makeScene2D(function* (view) {
         })}
       </Node>
 
-      {/* Placeholder metadata section, deliberately left in the older form for now. */}
-      <Node ref={metadataStage} opacity={0}>
-        <Node ref={metaChunkA} x={-430} y={-95} opacity={0} scale={0.84}>
-          <ChunkCard name={'tEXt'} color={COLORS.orange} width={230} height={116} />
-        </Node>
 
-        <Node ref={metaChunkB} x={-430} y={145} opacity={0} scale={0.84}>
-          <ChunkCard name={'gAMA'} color={COLORS.purple} width={230} height={116} />
-        </Node>
-
-        {[
-          {text: 'author', x: -20, y: -165, color: COLORS.orange},
-          {text: 'comment', x: 190, y: -110, color: COLORS.purple},
-          {text: 'gamma', x: -10, y: 55, color: COLORS.orange},
-          {text: 'palette', x: 215, y: 115, color: COLORS.purple},
-        ].map((chip, index) => (
-          <Node
-            ref={metadataChipRefs[index]}
-            key={`meta-${chip.text}`}
-            x={chip.x}
-            y={chip.y}
-            opacity={0}
-            scale={0.72}
-          >
-            <Rect
-              width={190}
-              height={76}
-              radius={28}
-              fill={COLORS.card}
-              stroke={chip.color}
-              lineWidth={4}
-              shadowColor={COLORS.shadow}
-              shadowBlur={18}
-              shadowOffsetY={8}
-            />
-            <Circle width={18} height={18} x={-62} fill={chip.color} />
-            <Txt
-              text={chip.text}
-              x={18}
-              fill={COLORS.text}
-              fontFamily={'Arial'}
-              fontWeight={700}
-              fontSize={26}
-            />
-          </Node>
-        ))}
-
-        <Node x={370} y={10}>
-          <Rect
-            width={420}
-            height={340}
-            radius={38}
-            fill={COLORS.card}
-            stroke={COLORS.border}
-            lineWidth={5}
-            shadowColor={COLORS.shadow}
-            shadowBlur={26}
-            shadowOffsetY={10}
-          />
-          <Node scale={1.7}>
-            <PngPreview />
-          </Node>
-        </Node>
-      </Node>
     </Node>,
   );
 
@@ -733,15 +856,15 @@ export default makeScene2D(function* (view) {
 
   // Pixels stream from the IDAT chunks and fill a complete grid.
   yield* sequence(
-    0.00894,
+    0.00666,
     ...pixelRefs.map((ref, index) => {
       const col = index % PIXEL_COLS;
       const row = Math.floor(index / PIXEL_COLS);
 
-      // 14x10, 30px cells on a 34px pitch = ~472x336,
-      // matching the displayed PngPreview's footprint.
-      const targetX = 139 + col * 34;
-      const targetY = -123 + row * 34;
+      // 17x11, 34px cells on a 40px pitch. This leaves only a small,
+      // even margin around the grid and matches the final image area better.
+      const targetX = 40 + col * 40;
+      const targetY = -164 + row * 40;
 
       return chain(
         ref().opacity(1, 0.08, easeOutCubic),
@@ -755,60 +878,22 @@ export default makeScene2D(function* (view) {
 
   yield* waitFor(0.28);
 
-  // The finished grid dissolves into the actual PngPreview used elsewhere.
+  // The finished grid dissolves into the same mountain scene used in Scene 4.
   yield* all(
     ...pixelRefs.map(ref => ref().opacity(0, 0.48, easeInCubic)),
-    pngPreview().opacity(1, 0.54, easeOutCubic),
+    landscapePreview().opacity(1, 0.54, easeOutCubic),
   );
   yield* waitFor(0.68);
 
-  // ---------------------------------------------------------------------------
-  // Metadata placeholder restored at the same length/timing as the earlier
-  // version. We'll redesign the visuals in the next pass.
-  // ---------------------------------------------------------------------------
+  // Hold briefly on the completed image, then end the scene.
+  yield* waitFor(0.68);
 
+  // Clear the source IDAT chunks while keeping the image viewer on screen.
   yield* all(
     imageChunkA().opacity(0, 0.30, easeInCubic),
     imageChunkB().opacity(0, 0.30, easeInCubic),
-    imageStage().opacity(0, 0.36, easeInCubic),
-    metadataStage().opacity(1, 0.30, easeOutCubic),
-    metaChunkA().opacity(1, 0.30, easeOutCubic),
-    metaChunkA().scale(1, 0.42, easeOutCubic),
-    metaChunkB().opacity(1, 0.30, easeOutCubic),
-    metaChunkB().scale(1, 0.42, easeOutCubic),
   );
-  yield* waitFor(0.52);
 
-  yield* sequence(
-    0.14,
-    ...metadataChipRefs.map(ref =>
-      all(
-        ref().opacity(1, 0.24, easeOutCubic),
-        ref().scale(1, 0.36, easeOutCubic),
-      ),
-    ),
-  );
-  yield* waitFor(2.22);
-
-  yield* all(
-    metaChunkA().opacity(0.20, 0.45, easeInCubic),
-    metaChunkB().opacity(0.20, 0.45, easeInCubic),
-    sequence(
-      0.08,
-      ...metadataChipRefs.map((ref, index) =>
-        all(
-          ref().position.y(
-            ref().position.y() - 110 - index * 12,
-            0.72,
-            easeInCubic,
-          ),
-          ref().opacity(0, 0.56, easeInCubic),
-          ref().scale(0.82, 0.56, easeInCubic),
-        ),
-      ),
-    ),
-  );
-  yield* waitFor(1.55);
-
-  yield* waitFor(1.80);
+  // Net result: Scene 6 is shortened by 7 seconds.
+  yield* waitFor(0.95);
 });
