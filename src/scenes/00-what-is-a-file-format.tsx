@@ -31,9 +31,9 @@ const TYPE_DURATION = 1.55;
 const FINISHED_HOLD = 0.45;
 const PILL_OUT_DURATION = 0.70;
 
-const PILL_WIDTH = 840;
-const PILL_HEIGHT = 94;
-const COLLAPSED_WIDTH = 22;
+const PILL_WIDTH = 1050;
+const PILL_HEIGHT = 118;
+const COLLAPSED_WIDTH = 28;
 
 export default makeScene2D(function* (view) {
   const pill = createRef<Rect>();
@@ -44,8 +44,8 @@ export default makeScene2D(function* (view) {
       ref={pill}
       width={COLLAPSED_WIDTH}
       height={PILL_HEIGHT}
-      y={-315}
-      radius={16}
+      y={-337}
+      radius={20}
       fill={COLORS.card}
       shadowColor={COLORS.shadow}
       shadowBlur={22}
@@ -57,11 +57,11 @@ export default makeScene2D(function* (view) {
         ref={title}
         text={''}
         fill={COLORS.text}
-        fontSize={58}
+        fontSize={73}
         fontFamily={'Courier New'}
         fontWeight={700}
         textAlign={'center'}
-        width={PILL_WIDTH - 70}
+        width={PILL_WIDTH - 88}
       />
     </Rect>,
   );
