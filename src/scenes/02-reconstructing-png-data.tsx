@@ -25,7 +25,7 @@ const COLORS = {
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
-  shadow: 'rgba(0,0,0,0.38)',
+  shadow: 'rgba(0,0,0,0.28)',
   shadowSoft: 'rgba(0,0,0,0.28)',
   code: '#D8DCE7',
   checkerA: '#343746',
@@ -74,7 +74,7 @@ function PreviousSceneState({
     <Node>
       <Node ref={byteRowRef} y={-155}>
         {rawBytes.map((byte, index) => (
-          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={4}>
+          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={4} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10}>
             <Txt ref={byteTextRefs[index]} text={byte} fill={COLORS.text} fontSize={46} fontFamily={'monospace'} fontWeight={700} />
           </Rect>
         ))}

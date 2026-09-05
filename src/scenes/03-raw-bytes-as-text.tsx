@@ -25,7 +25,7 @@ const COLORS = {
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
-  shadow: 'rgba(0,0,0,0.38)',
+  shadow: 'rgba(0,0,0,0.28)',
   shadowSoft: 'rgba(0,0,0,0.28)',
   code: '#D8DCE7',
   checkerA: '#343746',
@@ -175,6 +175,9 @@ export default makeScene2D(function* (view) {
                 ? COLORS.checkerA
                 : COLORS.checkerB
             }
+            shadowColor={byteIndex >= 0 ? COLORS.shadow : 'rgba(0,0,0,0)'}
+            shadowBlur={0}
+            shadowOffsetY={0}
           >
             {byteIndex >= 0 ? (
               <>
@@ -232,6 +235,9 @@ export default makeScene2D(function* (view) {
             fill={color}
             stroke={COLORS.borderStrong}
             lineWidth={5}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
             opacity={0}
             scale={0.2}
             zIndex={4}
@@ -252,8 +258,8 @@ export default makeScene2D(function* (view) {
           radius={18}
           fill={COLORS.windowShell}
           shadowColor={COLORS.shadow}
-          shadowBlur={24}
-          shadowOffsetY={11}
+          shadowBlur={22}
+          shadowOffsetY={10}
           clip
         >
           <Rect
@@ -381,6 +387,9 @@ export default makeScene2D(function* (view) {
                 fill={COLORS.card}
                 stroke={COLORS.borderStrong}
                 lineWidth={5}
+                shadowColor={COLORS.shadow}
+                shadowBlur={22}
+                shadowOffsetY={10}
               >
                 <Txt
                   ref={endingByteRefs[index]}
@@ -622,6 +631,18 @@ export default makeScene2D(function* (view) {
 
           ref().lineWidth(
             3,
+            0.70,
+            easeInOutCubic,
+          ),
+
+          ref().shadowBlur(
+            22,
+            0.70,
+            easeInOutCubic,
+          ),
+
+          ref().shadowOffset(
+            [0, 10],
             0.70,
             easeInOutCubic,
           ),

@@ -156,7 +156,7 @@ const COLORS = {
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
-  shadow: 'rgba(0,0,0,0.38)',
+  shadow: 'rgba(0,0,0,0.28)',
   shadowSoft: 'rgba(0,0,0,0.28)',
   clickA: 'rgba(140,124,255,0.78)',
   clickB: 'rgba(140,124,255,0.46)',
@@ -287,6 +287,9 @@ export default makeScene2D(function* (view) {
               fill={COLORS.card}
               stroke={COLORS.borderStrong}
               lineWidth={5}
+              shadowColor={COLORS.shadow}
+              shadowBlur={22}
+              shadowOffsetY={10}
             >
               <Txt
                 ref={openingByteRefs[index]}
@@ -332,9 +335,9 @@ export default makeScene2D(function* (view) {
           fill={COLORS.panel}
           stroke={COLORS.border}
           lineWidth={3}
-          shadowColor={COLORS.shadowSoft}
-          shadowBlur={30}
-          shadowOffsetY={12}
+          shadowColor={COLORS.shadow}
+          shadowBlur={22}
+          shadowOffsetY={10}
         />
 
         {dataLineWidths.map(
@@ -545,8 +548,8 @@ export default makeScene2D(function* (view) {
           shadowColor={
             COLORS.shadow
           }
-          shadowBlur={34}
-          shadowOffsetY={14}
+          shadowBlur={22}
+          shadowOffsetY={10}
           clip
         >
           {/*
@@ -1024,7 +1027,7 @@ export default makeScene2D(function* (view) {
         y={-315}
         radius={16}
         fill={COLORS.card}
-        shadowColor={COLORS.shadowSoft}
+        shadowColor={COLORS.shadow}
         shadowBlur={22}
         shadowOffsetY={10}
         opacity={0}
@@ -1070,9 +1073,9 @@ export default makeScene2D(function* (view) {
             stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={14}
-            shadowColor={COLORS.shadowSoft}
-            shadowBlur={20}
-            shadowOffsetY={9}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
 
           <Line
@@ -1142,9 +1145,9 @@ export default makeScene2D(function* (view) {
             stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
-            shadowColor={COLORS.shadowSoft}
-            shadowBlur={14}
-            shadowOffsetY={6}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
 
           <Line
@@ -1185,9 +1188,9 @@ export default makeScene2D(function* (view) {
             stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
-            shadowColor={COLORS.shadowSoft}
-            shadowBlur={14}
-            shadowOffsetY={6}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
 
           <Line

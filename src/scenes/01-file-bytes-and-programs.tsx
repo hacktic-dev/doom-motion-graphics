@@ -29,7 +29,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
-  shadow: 'rgba(0,0,0,0.38)',
+  shadow: 'rgba(0,0,0,0.28)',
   shadowSoft: 'rgba(0,0,0,0.28)',
 };
 
@@ -168,6 +168,9 @@ export default makeScene2D(function* (view) {
             fill={COLORS.card}
             stroke={COLORS.borderStrong}
             lineWidth={4}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
             opacity={0}
             scale={0.08}
           >
