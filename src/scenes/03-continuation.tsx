@@ -10,6 +10,34 @@ import {
   waitFor,
 } from '@motion-canvas/core';
 
+
+const COLORS = {
+  background: '#21232E',
+  card: '#343746',
+  panel: '#2B2E3B',
+  panelDeep: '#242733',
+  windowShell: '#2C2F3B',
+  titlebar: '#1B1D26',
+  border: '#50566A',
+  borderStrong: '#646B82',
+  text: '#F4F6FA',
+  textMuted: '#AEB5C6',
+  mutedBar: '#697187',
+  accent: '#8C7CFF',
+  accentGlow: 'rgba(140,124,255,0.24)',
+  shadow: 'rgba(0,0,0,0.38)',
+  shadowSoft: 'rgba(0,0,0,0.28)',
+  code: '#D8DCE7',
+  checkerA: '#343746',
+  checkerB: '#242733',
+  redFill: '#533238',
+  redText: '#FF7777',
+  greenFill: '#2E4438',
+  greenText: '#78D996',
+  blueFill: '#2D4054',
+  blueText: '#72B8FF',
+};
+
 const rawBytes = [
   '89', '50', '4E', '47', '0D', '0A', '1A', '0A',
   '00', '00', '00', '0D', '49', '48', '44', '52',
@@ -25,15 +53,15 @@ const textCharacters = [
 ];
 
 const channelFills = [
-  '#ffd1d1',
-  '#d4f0d5',
-  '#cfe8ff',
+  COLORS.redFill,
+  COLORS.greenFill,
+  COLORS.blueFill,
 ];
 
 const channelTextColors = [
-  '#c93636',
-  '#378b42',
-  '#287dbd',
+  COLORS.redText,
+  COLORS.greenText,
+  COLORS.blueText,
 ];
 
 const rgbGroupStarts = [
@@ -118,6 +146,15 @@ export default makeScene2D(function* (view) {
   );
 
   view.add(
+    <Rect
+      width={'100%'}
+      height={'100%'}
+      fill={COLORS.background}
+      zIndex={-100}
+    />,
+  );
+
+  view.add(
     <Node scale={1.25}>
       {/* Opening checkerboard state. */}
       {checkerRefs.map((ref, index) => {
@@ -135,8 +172,8 @@ export default makeScene2D(function* (view) {
             height={100}
             fill={
               (column + row) % 2 === 0
-                ? '#d8d8d8'
-                : '#ffffff'
+                ? COLORS.checkerA
+                : COLORS.checkerB
             }
           >
             {byteIndex >= 0 ? (
@@ -144,7 +181,7 @@ export default makeScene2D(function* (view) {
                 <Txt
                   ref={byteTextRefs[byteIndex]}
                   text={rawBytes[byteIndex]}
-                  fill={'#2b2b2b'}
+                  fill={COLORS.text}
                   fontSize={28}
                   fontFamily={'monospace'}
                   fontWeight={700}
@@ -154,7 +191,7 @@ export default makeScene2D(function* (view) {
                 <Txt
                   ref={previewGlyphRefs[byteIndex]}
                   text={''}
-                  fill={'#2b2b2b'}
+                  fill={COLORS.text}
                   fontSize={30}
                   fontFamily={'monospace'}
                   fontWeight={700}
@@ -172,7 +209,7 @@ export default makeScene2D(function* (view) {
         y={40}
         width={280}
         height={280}
-        fill={'#42a5f5'}
+        fill={COLORS.blueText}
         opacity={0.48}
         scale={1.5}
         zIndex={2}
@@ -193,9 +230,9 @@ export default makeScene2D(function* (view) {
             height={82}
             radius={16}
             fill={color}
-            stroke={'#ffffff'}
+            stroke={COLORS.borderStrong}
             lineWidth={5}
-            shadowColor={'rgba(0,0,0,0.20)'}
+            shadowColor={COLORS.shadowSoft}
             shadowBlur={14}
             opacity={0}
             scale={0.2}
@@ -215,10 +252,10 @@ export default makeScene2D(function* (view) {
           width={1050}
           height={520}
           radius={18}
-          fill={'#f2f2f2'}
-          stroke={'#2f2f2f'}
+          fill={COLORS.windowShell}
+          stroke={COLORS.borderStrong}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowColor={COLORS.shadow}
           shadowBlur={24}
           shadowOffsetY={11}
           clip
@@ -227,7 +264,17 @@ export default makeScene2D(function* (view) {
             width={1050}
             height={52}
             y={-234}
-            fill={'#2f3238'}
+            fill={COLORS.titlebar}
+          />
+
+          <Rect
+            width={1010}
+            height={430}
+            y={27}
+            radius={12}
+            fill={COLORS.panelDeep}
+            stroke={COLORS.border}
+            lineWidth={2}
           />
 
           <Circle
@@ -262,7 +309,7 @@ export default makeScene2D(function* (view) {
             fontSize={27}
             fontFamily={'Arial'}
             fontWeight={600}
-            fill={'#ffffff'}
+            fill={COLORS.text}
             textAlign={'left'}
           />
 
@@ -277,7 +324,7 @@ export default makeScene2D(function* (view) {
                 fontSize={32}
                 fontFamily={'monospace'}
                 fontWeight={700}
-                fill={'#222222'}
+                fill={COLORS.code}
                 opacity={0}
                 scale={[0, 1]}
               />
@@ -300,7 +347,7 @@ export default makeScene2D(function* (view) {
           fontSize={32}
           fontFamily={'monospace'}
           fontWeight={700}
-          fill={'#222222'}
+          fill={COLORS.code}
           opacity={0}
           scale={[0, 1]}
           zIndex={3}
@@ -325,17 +372,17 @@ export default makeScene2D(function* (view) {
                 width={205}
                 height={170}
                 radius={24}
-                fill={'#f0f0f0'}
-                stroke={'#aaaaaa'}
+                fill={COLORS.card}
+                stroke={COLORS.borderStrong}
                 lineWidth={5}
-                shadowColor={'rgba(0,0,0,0.18)'}
+                shadowColor={COLORS.shadowSoft}
                 shadowBlur={18}
                 shadowOffsetY={8}
               >
                 <Txt
                   ref={endingByteRefs[index]}
                   text={byte}
-                  fill={'#2b2b2b'}
+                  fill={COLORS.text}
                   fontSize={66}
                   fontFamily={'monospace'}
                   fontWeight={700}
@@ -344,7 +391,7 @@ export default makeScene2D(function* (view) {
                 <Txt
                   ref={endingGlyphRefs[index]}
                   text={textCharacters[index]}
-                  fill={'#2b2b2b'}
+                  fill={COLORS.text}
                   fontSize={72}
                   fontFamily={'monospace'}
                   fontWeight={700}
@@ -410,8 +457,8 @@ export default makeScene2D(function* (view) {
     );
 
     if (mode === 'bytes') {
-      tile.fill('#eeeeee');
-      tile.stroke('#bdbdbd');
+      tile.fill(COLORS.card);
+      tile.stroke(COLORS.borderStrong);
 
       byteText.opacity(1);
       preview.opacity(0);
@@ -424,11 +471,11 @@ export default makeScene2D(function* (view) {
       const column = index % 16;
 
       if (column === 15) {
-        tile.fill('#e5e5e5');
-        tile.stroke('#c8c8c8');
+        tile.fill(COLORS.panel);
+        tile.stroke(COLORS.border);
 
         preview.text('…');
-        preview.fill('#888888');
+        preview.fill(COLORS.textMuted);
         preview.fontSize(28);
       } else {
         const channel = column % 3;
@@ -559,13 +606,13 @@ export default makeScene2D(function* (view) {
           ),
 
           ref().fill(
-            '#eeeeee',
+            COLORS.card,
             0.70,
             easeInOutCubic,
           ),
 
           ref().stroke(
-            '#bdbdbd',
+            COLORS.borderStrong,
             0.70,
             easeInOutCubic,
           ),

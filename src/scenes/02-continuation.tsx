@@ -10,6 +10,34 @@ import {
 
 import {PngPreview} from '../components/PngPreview';
 
+
+const COLORS = {
+  background: '#21232E',
+  card: '#343746',
+  panel: '#2B2E3B',
+  panelDeep: '#242733',
+  windowShell: '#2C2F3B',
+  titlebar: '#1B1D26',
+  border: '#50566A',
+  borderStrong: '#646B82',
+  text: '#F4F6FA',
+  textMuted: '#AEB5C6',
+  mutedBar: '#697187',
+  accent: '#8C7CFF',
+  accentGlow: 'rgba(140,124,255,0.24)',
+  shadow: 'rgba(0,0,0,0.38)',
+  shadowSoft: 'rgba(0,0,0,0.28)',
+  code: '#D8DCE7',
+  checkerA: '#343746',
+  checkerB: '#242733',
+  redFill: '#533238',
+  redText: '#FF7777',
+  greenFill: '#2E4438',
+  greenText: '#78D996',
+  blueFill: '#2D4054',
+  blueText: '#72B8FF',
+};
+
 const rawBytes = ['89', '50', '4E', '47', '0D', '0A', '1A', '0A'];
 const WINDOW_X = 300;
 const WINDOW_Y = 205;
@@ -46,33 +74,35 @@ function PreviousSceneState({
     <Node>
       <Node ref={byteRowRef} y={-155}>
         {rawBytes.map((byte, index) => (
-          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={'#eeeeee'} stroke={'#bdbdbd'} lineWidth={4}>
-            <Txt ref={byteTextRefs[index]} text={byte} fill={'#2b2b2b'} fontSize={46} fontFamily={'monospace'} fontWeight={700} />
+          <Rect ref={byteRefs[index]} key={`${index}`} width={125} height={100} x={(index - 3.5) * 155} radius={12} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={4} shadowColor={COLORS.shadowSoft} shadowBlur={16} shadowOffsetY={7}>
+            <Txt ref={byteTextRefs[index]} text={byte} fill={COLORS.text} fontSize={46} fontFamily={'monospace'} fontWeight={700} />
           </Rect>
         ))}
       </Node>
       <Node ref={arrowGroupRef}>
-        <Line points={[[0, -92], [0, -66]]} stroke={'#333333'} lineWidth={5} lineCap={'round'} />
-        <Path data={`M 0 -66 C 0 -25, ${-WINDOW_X} -40, ${-WINDOW_X} -5 L ${-WINDOW_X} 22`} stroke={'#333333'} lineWidth={5} lineCap={'round'} endArrow arrowSize={14} />
-        <Path data={`M 0 -66 C 0 -25, ${WINDOW_X} -40, ${WINDOW_X} -5 L ${WINDOW_X} 22`} stroke={'#333333'} lineWidth={5} lineCap={'round'} endArrow arrowSize={14} />
+        <Line points={[[0, -92], [0, -66]]} stroke={COLORS.textMuted} lineWidth={5} lineCap={'round'} />
+        <Path data={`M 0 -66 C 0 -25, ${-WINDOW_X} -40, ${-WINDOW_X} -5 L ${-WINDOW_X} 22`} stroke={COLORS.textMuted} lineWidth={5} lineCap={'round'} endArrow arrowSize={14} />
+        <Path data={`M 0 -66 C 0 -25, ${WINDOW_X} -40, ${WINDOW_X} -5 L ${WINDOW_X} 22`} stroke={COLORS.textMuted} lineWidth={5} lineCap={'round'} endArrow arrowSize={14} />
       </Node>
 
       <Node ref={windowGroupRef}>
         <Node x={-WINDOW_X} y={WINDOW_Y}>
-          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={'#f2f2f2'} stroke={'#2f2f2f'} lineWidth={3} shadowColor={'rgba(0,0,0,0.22)'} shadowBlur={22} shadowOffsetY={10} clip>
-            <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={'#2f3238'} />
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} stroke={COLORS.borderStrong} lineWidth={3} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
+            <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
+            <Rect width={WINDOW_WIDTH - 34} height={WINDOW_HEIGHT - TITLEBAR_HEIGHT - 34} y={TITLEBAR_HEIGHT / 2 + 8} radius={11} fill={COLORS.panelDeep} stroke={COLORS.border} lineWidth={2} />
             <WindowControls />
-            <Txt text={'Image Viewer'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={'#ffffff'} textAlign={'left'} />
+            <Txt text={'Image Viewer'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
             <Node y={21}><PngPreview scale={3.15} /></Node>
           </Rect>
         </Node>
 
         <Node x={WINDOW_X} y={WINDOW_Y}>
-          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={'#f2f2f2'} stroke={'#2f2f2f'} lineWidth={3} shadowColor={'rgba(0,0,0,0.22)'} shadowBlur={22} shadowOffsetY={10} clip>
-            <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={'#2f3238'} />
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} stroke={COLORS.borderStrong} lineWidth={3} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
+            <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
+            <Rect width={WINDOW_WIDTH - 34} height={WINDOW_HEIGHT - TITLEBAR_HEIGHT - 34} y={TITLEBAR_HEIGHT / 2 + 8} radius={11} fill={COLORS.panelDeep} stroke={COLORS.border} lineWidth={2} />
             <WindowControls />
-            <Txt text={'Text Editor'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={'#ffffff'} textAlign={'left'} />
-            <Txt text={'%PNG....IHDR...........sRGB\n....gAMA........IDATx....'} y={-65} width={440} fontSize={30} lineHeight={42} fontFamily={'monospace'} fill={'#111111'} textAlign={'left'} />
+            <Txt text={'Text Editor'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
+            <Txt text={'%PNG....IHDR...........sRGB\n....gAMA........IDATx....'} y={-65} width={440} fontSize={30} lineHeight={42} fontFamily={'monospace'} fill={COLORS.code} textAlign={'left'} />
           </Rect>
         </Node>
       </Node>
@@ -96,6 +126,15 @@ export default makeScene2D(function* (view) {
   const transparencyGrid = createRef<Node>();
 
   view.add(
+    <Rect
+      width={'100%'}
+      height={'100%'}
+      fill={COLORS.background}
+      zIndex={-100}
+    />,
+  );
+
+  view.add(
     <Node scale={1.25}>
       <PreviousSceneState
         arrowGroupRef={arrowGroup}
@@ -106,23 +145,23 @@ export default makeScene2D(function* (view) {
       />
 
       {/* One evolving data object: color, then position, then transparency. */}
-      <Circle ref={redStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} zIndex={2} />
-      <Circle ref={greenStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} />
-      <Circle ref={blueStamp} width={280} height={280} fill={'#ffffff'} opacity={0} scale={0.82} />
-      <Circle ref={dataOrb} width={230} height={230} fill={'#ffffff'} stroke={'#d0d0d0'} lineWidth={3} opacity={0} scale={0.08} zIndex={2} />
+      <Circle ref={redStamp} width={280} height={280} fill={COLORS.card} opacity={0} scale={0.82} zIndex={2} />
+      <Circle ref={greenStamp} width={280} height={280} fill={COLORS.card} opacity={0} scale={0.82} />
+      <Circle ref={blueStamp} width={280} height={280} fill={COLORS.card} opacity={0} scale={0.82} />
+      <Circle ref={dataOrb} width={230} height={230} fill={COLORS.card} stroke={COLORS.borderStrong} lineWidth={3} opacity={0} scale={0.08} zIndex={2} />
 
       <Node ref={positionGuides} opacity={0}>
-        <Line ref={positionXAxis} points={[[-600, 170], [600, 170]]} stroke={'#777777'} lineWidth={6} lineCap={'round'} endArrow arrowSize={18} end={0} />
-        <Line ref={positionYAxis} points={[[0, 350], [0, -330]]} stroke={'#777777'} lineWidth={6} lineCap={'round'} endArrow arrowSize={18} end={0} />
-        <Line points={[[300, -100], [300, 170]]} stroke={'#b5b5b5'} lineWidth={5} lineDash={[13, 10]} />
-        <Line points={[[0, -100], [300, -100]]} stroke={'#b5b5b5'} lineWidth={5} lineDash={[13, 10]} />
+        <Line ref={positionXAxis} points={[[-600, 170], [600, 170]]} stroke={COLORS.textMuted} lineWidth={6} lineCap={'round'} endArrow arrowSize={18} end={0} />
+        <Line ref={positionYAxis} points={[[0, 350], [0, -330]]} stroke={COLORS.textMuted} lineWidth={6} lineCap={'round'} endArrow arrowSize={18} end={0} />
+        <Line points={[[300, -100], [300, 170]]} stroke={COLORS.border} lineWidth={5} lineDash={[13, 10]} />
+        <Line points={[[0, -100], [300, -100]]} stroke={COLORS.border} lineWidth={5} lineDash={[13, 10]} />
       </Node>
 
       <Node ref={transparencyGrid} opacity={0}>
         {Array.from({length: 160}, (_, index) => {
           const column = index % 16;
           const row = Math.floor(index / 16);
-          return <Rect key={`${index}`} x={(column - 7.5) * 100} y={(row - 4.5) * 100} width={100} height={100} fill={(column + row) % 2 === 0 ? '#d8d8d8' : '#ffffff'} />;
+          return <Rect key={`${index}`} x={(column - 7.5) * 100} y={(row - 4.5) * 100} width={100} height={100} fill={(column + row) % 2 === 0 ? COLORS.checkerA : COLORS.checkerB} />;
         })}
       </Node>
     </Node>,
@@ -150,8 +189,8 @@ export default makeScene2D(function* (view) {
       ref().width(230, t(0.45), easeInOutCubic),
       ref().height(230, t(0.45), easeInOutCubic),
       ref().radius(115, t(0.45), easeInOutCubic),
-      ref().fill('#ffffff', t(0.45), easeInOutCubic),
-      ref().stroke('#d0d0d0', t(0.45), easeInOutCubic),
+      ref().fill(COLORS.card, t(0.45), easeInOutCubic),
+      ref().stroke(COLORS.borderStrong, t(0.45), easeInOutCubic),
     ]),
     ...byteTextRefs.map(ref => ref().opacity(0, t(0.24), easeOutCubic)),
   );
@@ -164,15 +203,15 @@ export default makeScene2D(function* (view) {
     dataOrb().opacity(0, t(0.18), easeOutCubic),
     redStamp().opacity(1, t(0.12), easeOutCubic),
     redStamp().position([0, -170], t(0.45), easeInOutCubic),
-    redStamp().fill('#ef5350', t(0.36), easeInOutCubic),
+    redStamp().fill(COLORS.redText, t(0.36), easeInOutCubic),
     redStamp().scale(1, t(0.45), easeOutCubic),
     greenStamp().opacity(1, t(0.12), easeOutCubic),
     greenStamp().position([-240, 170], t(0.45), easeInOutCubic),
-    greenStamp().fill('#66bb6a', t(0.36), easeInOutCubic),
+    greenStamp().fill(COLORS.greenText, t(0.36), easeInOutCubic),
     greenStamp().scale(1, t(0.45), easeOutCubic),
     blueStamp().opacity(1, t(0.12), easeOutCubic),
     blueStamp().position([240, 170], t(0.45), easeInOutCubic),
-    blueStamp().fill('#42a5f5', t(0.36), easeInOutCubic),
+    blueStamp().fill(COLORS.blueText, t(0.36), easeInOutCubic),
     blueStamp().scale(1, t(0.45), easeOutCubic),
   );
   yield* waitFor(t(0.51));
@@ -194,7 +233,7 @@ export default makeScene2D(function* (view) {
     positionGuides().opacity(0, t(0.25), easeOutCubic),
     transparencyGrid().opacity(1, t(0.45), easeOutCubic),
     redStamp().position([0, 40], t(0.45), easeInOutCubic),
-    redStamp().fill('#42a5f5', t(0.45), easeInOutCubic),
+    redStamp().fill(COLORS.blueText, t(0.45), easeInOutCubic),
     redStamp().opacity(0.48, t(0.45), easeInOutCubic),
     redStamp().scale(1.5, t(0.45), easeInOutCubic),
   );

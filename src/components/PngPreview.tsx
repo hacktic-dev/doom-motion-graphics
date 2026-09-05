@@ -18,11 +18,11 @@ export function PngPreview({scale = 1}: PngPreviewProps) {
 
         <Line
           points={[
-            [-55, 40],
+            [-55, 45],
             [-18, 0],
             [5, 24],
             [28, -5],
-            [55, 40],
+            [55, 45],
           ]}
           closed
           fill={'#62a66f'}

@@ -20,6 +20,19 @@ import {
 
 import {PngPreview} from '../components/PngPreview';
 
+const COLORS = {
+  background: '#21232E',
+  card: '#343746',
+  panelDeep: '#242733',
+  titlebar: '#1B1D26',
+  border: '#50566A',
+  borderStrong: '#646B82',
+  text: '#F4F6FA',
+  textMuted: '#AEB5C6',
+  shadow: 'rgba(0,0,0,0.38)',
+  shadowSoft: 'rgba(0,0,0,0.28)',
+};
+
 export default makeScene2D(function* (view) {
   const root = createRef<Node>();
 
@@ -63,6 +76,15 @@ export default makeScene2D(function* (view) {
   const DIMMED_OPACITY = 0.35;
 
   view.add(
+    <Rect
+      width={'100%'}
+      height={'100%'}
+      fill={COLORS.background}
+      zIndex={-100}
+    />,
+  );
+
+  view.add(
     <Node ref={root} scale={1.25}>
       {/* PNG file */}
       <Node ref={file} opacity={0} scale={0.08}>
@@ -76,8 +98,8 @@ export default makeScene2D(function* (view) {
               [-75, 90],
             ]}
             closed
-            fill={'#ffffff'}
-            stroke={'#c8c8c8'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
           />
@@ -88,7 +110,7 @@ export default makeScene2D(function* (view) {
               [35, -50],
               [75, -50],
             ]}
-            stroke={'#c8c8c8'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -97,7 +119,7 @@ export default makeScene2D(function* (view) {
               [35, -90],
               [75, -50],
             ]}
-            stroke={'#c8c8c8'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -108,7 +130,7 @@ export default makeScene2D(function* (view) {
 
         <Txt
           text={'image.png'}
-          fill={'#2b2b2b'}
+          fill={COLORS.text}
           fontSize={34}
           fontFamily={'Arial'}
           fontWeight={500}
@@ -123,7 +145,7 @@ export default makeScene2D(function* (view) {
           [0, -58],
           [0, 5],
         ]}
-        stroke={'#777777'}
+        stroke={COLORS.textMuted}
         lineWidth={5}
         lineCap={'round'}
         end={0}
@@ -140,15 +162,15 @@ export default makeScene2D(function* (view) {
             height={100}
             x={(index - (rawBytes.length - 1) / 2) * 155}
             radius={12}
-            fill={'#eeeeee'}
-            stroke={'#bdbdbd'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             opacity={0}
             scale={0.08}
           >
             <Txt
               text={byte}
-              fill={'#2b2b2b'}
+              fill={COLORS.text}
               fontSize={46}
               fontFamily={'monospace'}
               fontWeight={700}
@@ -164,7 +186,7 @@ export default makeScene2D(function* (view) {
           [0, -92],
           [0, -66],
         ]}
-        stroke={'#333333'}
+        stroke={COLORS.textMuted}
         lineWidth={5}
         lineCap={'round'}
         end={0}
@@ -174,7 +196,7 @@ export default makeScene2D(function* (view) {
       <Path
         ref={leftArrow}
         data={`M 0 -66 C 0 -25, ${-WINDOW_X} -40, ${-WINDOW_X} -5 L ${-WINDOW_X} 22`}
-        stroke={'#333333'}
+        stroke={COLORS.textMuted}
         lineWidth={5}
         lineCap={'round'}
         endArrow
@@ -186,7 +208,7 @@ export default makeScene2D(function* (view) {
       <Path
         ref={rightArrow}
         data={`M 0 -66 C 0 -25, ${WINDOW_X} -40, ${WINDOW_X} -5 L ${WINDOW_X} 22`}
-        stroke={'#333333'}
+        stroke={COLORS.textMuted}
         lineWidth={5}
         lineCap={'round'}
         endArrow
@@ -207,10 +229,10 @@ export default makeScene2D(function* (view) {
           width={WINDOW_WIDTH}
           height={WINDOW_HEIGHT}
           radius={16}
-          fill={'#f2f2f2'}
-          stroke={'#2f2f2f'}
+          fill={COLORS.panelDeep}
+          stroke={COLORS.borderStrong}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowColor={COLORS.shadow}
           shadowBlur={22}
           shadowOffsetY={10}
           clip
@@ -219,7 +241,7 @@ export default makeScene2D(function* (view) {
             width={WINDOW_WIDTH}
             height={TITLEBAR_HEIGHT}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
-            fill={'#2f3238'}
+            fill={COLORS.titlebar}
           />
 
           <Circle
@@ -252,11 +274,11 @@ export default makeScene2D(function* (view) {
             fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
-            fill={'#ffffff'}
+            fill={COLORS.text}
             textAlign={'left'}
           />
 
-          <Node y={21}>
+          <Node y={24}>
             <PngPreview scale={3.15} />
           </Node>
         </Rect>
@@ -274,10 +296,10 @@ export default makeScene2D(function* (view) {
           width={WINDOW_WIDTH}
           height={WINDOW_HEIGHT}
           radius={16}
-          fill={'#f2f2f2'}
-          stroke={'#2f2f2f'}
+          fill={COLORS.panelDeep}
+          stroke={COLORS.borderStrong}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.22)'}
+          shadowColor={COLORS.shadow}
           shadowBlur={22}
           shadowOffsetY={10}
           clip
@@ -286,7 +308,7 @@ export default makeScene2D(function* (view) {
             width={WINDOW_WIDTH}
             height={TITLEBAR_HEIGHT}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
-            fill={'#2f3238'}
+            fill={COLORS.titlebar}
           />
 
           <Circle
@@ -319,7 +341,7 @@ export default makeScene2D(function* (view) {
             fontSize={24}
             fontFamily={'Arial'}
             fontWeight={600}
-            fill={'#ffffff'}
+            fill={COLORS.text}
             textAlign={'left'}
           />
 
@@ -331,7 +353,7 @@ export default makeScene2D(function* (view) {
             fontSize={30}
             lineHeight={42}
             fontFamily={'monospace'}
-            fill={'#111111'}
+            fill={COLORS.text}
             textAlign={'left'}
           />
         </Rect>

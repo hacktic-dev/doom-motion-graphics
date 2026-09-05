@@ -143,6 +143,27 @@ const treePositions = [
   [318, 132],
 ];
 
+const COLORS = {
+  background: '#21232E',
+  card: '#343746',
+  panel: '#2B2E3B',
+  windowShell: '#2C2F3B',
+  titlebar: '#1B1D26',
+  border: '#50566A',
+  borderStrong: '#646B82',
+  text: '#F4F6FA',
+  textMuted: '#AEB5C6',
+  mutedBar: '#697187',
+  accent: '#8C7CFF',
+  accentGlow: 'rgba(140,124,255,0.24)',
+  shadow: 'rgba(0,0,0,0.38)',
+  shadowSoft: 'rgba(0,0,0,0.28)',
+  clickA: 'rgba(140,124,255,0.78)',
+  clickB: 'rgba(140,124,255,0.46)',
+  cursorStroke: '#11131A',
+  code: '#D8DCE7',
+};
+
 const DOOM_ZOOM_START = 1.004;
 const DOOM_ZOOM_END = 1.045;
 const DOOM_ZOOM_DURATION = 2.10;
@@ -230,6 +251,15 @@ export default makeScene2D(function* (view) {
    */
 
   view.add(
+    <Rect
+      width={'100%'}
+      height={'100%'}
+      fill={COLORS.background}
+      zIndex={-100}
+    />,
+  );
+
+  view.add(
     <Node scale={1.25}>
       {/*
        * -------------------------------------------------------
@@ -250,17 +280,17 @@ export default makeScene2D(function* (view) {
               width={205}
               height={170}
               radius={24}
-              fill={'#f0f0f0'}
-              stroke={'#aaaaaa'}
+              fill={COLORS.card}
+              stroke={COLORS.borderStrong}
               lineWidth={5}
-              shadowColor={'rgba(0,0,0,0.18)'}
-              shadowBlur={18}
-              shadowOffsetY={8}
+              shadowColor={COLORS.shadow}
+              shadowBlur={22}
+              shadowOffsetY={10}
             >
               <Txt
                 ref={openingByteRefs[index]}
                 text={byte}
-                fill={'#2b2b2b'}
+                fill={COLORS.text}
                 fontSize={66}
                 fontFamily={'monospace'}
                 fontWeight={700}
@@ -270,7 +300,7 @@ export default makeScene2D(function* (view) {
               <Txt
                 ref={openingGlyphRefs[index]}
                 text={openingGlyphs[index]}
-                fill={'#2b2b2b'}
+                fill={COLORS.text}
                 fontSize={72}
                 fontFamily={'monospace'}
                 fontWeight={700}
@@ -298,12 +328,12 @@ export default makeScene2D(function* (view) {
           width={870}
           height={620}
           radius={22}
-          fill={'#f7f7f7'}
-          stroke={'#b8b8b8'}
+          fill={COLORS.panel}
+          stroke={COLORS.border}
           lineWidth={3}
-          shadowColor={'rgba(0,0,0,0.16)'}
-          shadowBlur={22}
-          shadowOffsetY={9}
+          shadowColor={COLORS.shadowSoft}
+          shadowBlur={30}
+          shadowOffsetY={12}
         />
 
         {dataLineWidths.map(
@@ -321,7 +351,7 @@ export default makeScene2D(function* (view) {
               y={
                 dataLineInitialY[index]
               }
-              fill={'#b7b7b7'}
+              fill={COLORS.mutedBar}
             />
           ),
         )}
@@ -344,11 +374,11 @@ export default makeScene2D(function* (view) {
               y={
                 insertedLineY[index]
               }
-              fill={'#8874bd'}
+              fill={COLORS.accent}
               opacity={0}
               scale={[0.65, 1]}
               shadowColor={
-                'rgba(95,72,150,0.16)'
+                COLORS.accentGlow
               }
               shadowBlur={7}
             />
@@ -379,15 +409,13 @@ export default makeScene2D(function* (view) {
               [-75, 90],
             ]}
             closed
-            fill={'#ffffff'}
-            stroke={'#c8c8c8'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
-            shadowColor={
-              'rgba(0,0,0,0.18)'
-            }
-            shadowBlur={18}
-            shadowOffsetY={8}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
 
           <Line
@@ -396,7 +424,7 @@ export default makeScene2D(function* (view) {
               [35, -50],
               [75, -50],
             ]}
-            stroke={'#c8c8c8'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -405,7 +433,7 @@ export default makeScene2D(function* (view) {
               [35, -90],
               [75, -50],
             ]}
-            stroke={'#c8c8c8'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -416,7 +444,7 @@ export default makeScene2D(function* (view) {
 
         <Txt
           text={'image.png'}
-          fill={'#2b2b2b'}
+          fill={COLORS.text}
           fontSize={34}
           fontFamily={'Arial'}
           fontWeight={500}
@@ -437,7 +465,7 @@ export default makeScene2D(function* (view) {
         width={18}
         height={18}
         stroke={
-          'rgba(70,70,70,0.55)'
+          COLORS.clickA
         }
         lineWidth={3}
         fill={'rgba(0,0,0,0)'}
@@ -453,7 +481,7 @@ export default makeScene2D(function* (view) {
         width={18}
         height={18}
         stroke={
-          'rgba(70,70,70,0.32)'
+          COLORS.clickB
         }
         lineWidth={3}
         fill={'rgba(0,0,0,0)'}
@@ -488,11 +516,11 @@ export default makeScene2D(function* (view) {
             Z
           `}
           fill={'#ffffff'}
-          stroke={'#202020'}
+          stroke={COLORS.cursorStroke}
           lineWidth={2.8}
           lineJoin={'round'}
           shadowColor={
-            'rgba(0,0,0,0.20)'
+            COLORS.shadowSoft
           }
           shadowBlur={7}
           shadowOffsetX={2}
@@ -518,14 +546,14 @@ export default makeScene2D(function* (view) {
           width={WINDOW_WIDTH}
           height={WINDOW_HEIGHT}
           radius={18}
-          fill={'#f2f2f2'}
-          stroke={'#2f2f2f'}
+          fill={COLORS.windowShell}
+          stroke={COLORS.borderStrong}
           lineWidth={3}
           shadowColor={
-            'rgba(0,0,0,0.22)'
+            COLORS.shadow
           }
-          shadowBlur={24}
-          shadowOffsetY={11}
+          shadowBlur={34}
+          shadowOffsetY={14}
           clip
         >
           {/*
@@ -539,7 +567,7 @@ export default makeScene2D(function* (view) {
               -WINDOW_HEIGHT / 2 +
               TITLEBAR_HEIGHT / 2
             }
-            fill={'#2f3238'}
+            fill={COLORS.titlebar}
           />
 
           <Circle
@@ -596,7 +624,7 @@ export default makeScene2D(function* (view) {
   fontSize={28}
   fontFamily={'Arial'}
   fontWeight={600}
-  fill={'#ffffff'}
+  fill={COLORS.text}
   textAlign={'left'}
 />
 
@@ -617,7 +645,7 @@ export default makeScene2D(function* (view) {
             radius={14}
             y={CONTENT_Y}
             fill={'#dceefa'}
-            stroke={'#d1d1d1'}
+            stroke={COLORS.border}
             lineWidth={3}
             shadowColor={
               'rgba(0,0,0,0.08)'
@@ -982,7 +1010,7 @@ export default makeScene2D(function* (view) {
                 height={CONTENT_HEIGHT}
                 radius={14}
                 fill={'rgba(0,0,0,0)'}
-                stroke={'#d1d1d1'}
+                stroke={COLORS.border}
                 lineWidth={3}
               />
             </Rect>
@@ -1013,11 +1041,11 @@ export default makeScene2D(function* (view) {
               [-90, 125],
             ]}
             closed
-            fill={'#ffffff'}
-            stroke={'#aaaaaa'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={14}
-            shadowColor={'rgba(0,0,0,0.17)'}
+            shadowColor={COLORS.shadowSoft}
             shadowBlur={20}
             shadowOffsetY={9}
           />
@@ -1028,7 +1056,7 @@ export default makeScene2D(function* (view) {
               [38, -73],
               [90, -73],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1037,7 +1065,7 @@ export default makeScene2D(function* (view) {
               [38, -125],
               [90, -73],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1049,7 +1077,7 @@ export default makeScene2D(function* (view) {
               radius={7}
               x={-8}
               y={y}
-              fill={index < 2 ? '#b7b7b7' : '#8874bd'}
+              fill={index < 2 ? COLORS.mutedBar : COLORS.accent}
               opacity={index < 2 ? 1 : 0.92}
             />
           ))}
@@ -1060,7 +1088,7 @@ export default makeScene2D(function* (view) {
             [-92, -10],
             [-250, -10],
           ]}
-          stroke={'#777777'}
+          stroke={COLORS.textMuted}
           lineWidth={4}
           lineCap={'round'}
         />
@@ -1070,7 +1098,7 @@ export default makeScene2D(function* (view) {
             [92, -10],
             [250, -10],
           ]}
-          stroke={'#777777'}
+          stroke={COLORS.textMuted}
           lineWidth={4}
           lineCap={'round'}
         />
@@ -1085,11 +1113,11 @@ export default makeScene2D(function* (view) {
               [-76, 92],
             ]}
             closed
-            fill={'#ffffff'}
-            stroke={'#aaaaaa'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
-            shadowColor={'rgba(0,0,0,0.14)'}
+            shadowColor={COLORS.shadowSoft}
             shadowBlur={14}
             shadowOffsetY={6}
           />
@@ -1100,7 +1128,7 @@ export default makeScene2D(function* (view) {
               [30, -46],
               [76, -46],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1109,7 +1137,7 @@ export default makeScene2D(function* (view) {
               [30, -92],
               [76, -46],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1128,11 +1156,11 @@ export default makeScene2D(function* (view) {
               [-76, 92],
             ]}
             closed
-            fill={'#ffffff'}
-            stroke={'#aaaaaa'}
+            fill={COLORS.card}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
             radius={12}
-            shadowColor={'rgba(0,0,0,0.14)'}
+            shadowColor={COLORS.shadowSoft}
             shadowBlur={14}
             shadowOffsetY={6}
           />
@@ -1143,7 +1171,7 @@ export default makeScene2D(function* (view) {
               [30, -46],
               [76, -46],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1152,7 +1180,7 @@ export default makeScene2D(function* (view) {
               [30, -92],
               [76, -46],
             ]}
-            stroke={'#aaaaaa'}
+            stroke={COLORS.borderStrong}
             lineWidth={4}
           />
 
@@ -1163,7 +1191,7 @@ export default makeScene2D(function* (view) {
                 [-48, 11],
                 [-28, 30],
               ]}
-              stroke={'#565656'}
+              stroke={COLORS.code}
               lineWidth={9}
               lineCap={'round'}
               lineJoin={'round'}
@@ -1174,7 +1202,7 @@ export default makeScene2D(function* (view) {
                 [8, -8],
                 [-8, 30],
               ]}
-              stroke={'#565656'}
+              stroke={COLORS.code}
               lineWidth={9}
               lineCap={'round'}
             />
@@ -1185,7 +1213,7 @@ export default makeScene2D(function* (view) {
                 [48, 11],
                 [28, 30],
               ]}
-              stroke={'#565656'}
+              stroke={COLORS.code}
               lineWidth={9}
               lineCap={'round'}
               lineJoin={'round'}
