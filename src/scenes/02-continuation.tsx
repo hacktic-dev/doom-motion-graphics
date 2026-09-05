@@ -87,23 +87,27 @@ function PreviousSceneState({
 
       <Node ref={windowGroupRef}>
         <Node x={-WINDOW_X} y={WINDOW_Y}>
-          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} stroke={COLORS.borderStrong} lineWidth={3} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
             <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
             <Rect width={WINDOW_WIDTH - 34} height={WINDOW_HEIGHT - TITLEBAR_HEIGHT - 34} y={TITLEBAR_HEIGHT / 2 + 8} radius={11} fill={COLORS.panelDeep} stroke={COLORS.border} lineWidth={2} />
             <WindowControls />
             <Txt text={'Image Viewer'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
             <Node y={21}><PngPreview scale={3.15} /></Node>
           </Rect>
+          {/* Border overlay stays outside the clipped shell, keeping all four edges equally thick. */}
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={'rgba(0,0,0,0)'} stroke={COLORS.borderStrong} lineWidth={3} />
         </Node>
 
         <Node x={WINDOW_X} y={WINDOW_Y}>
-          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} stroke={COLORS.borderStrong} lineWidth={3} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.windowShell} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
             <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
             <Rect width={WINDOW_WIDTH - 34} height={WINDOW_HEIGHT - TITLEBAR_HEIGHT - 34} y={TITLEBAR_HEIGHT / 2 + 8} radius={11} fill={COLORS.panelDeep} stroke={COLORS.border} lineWidth={2} />
             <WindowControls />
             <Txt text={'Text Editor'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
             <Txt text={'%PNG....IHDR...........sRGB\n....gAMA........IDATx....'} y={-65} width={440} fontSize={30} lineHeight={42} fontFamily={'monospace'} fill={COLORS.code} textAlign={'left'} />
           </Rect>
+          {/* Border overlay stays outside the clipped shell, keeping all four edges equally thick. */}
+          <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={'rgba(0,0,0,0)'} stroke={COLORS.borderStrong} lineWidth={3} />
         </Node>
       </Node>
     </Node>

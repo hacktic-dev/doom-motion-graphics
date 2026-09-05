@@ -547,8 +547,6 @@ export default makeScene2D(function* (view) {
           height={WINDOW_HEIGHT}
           radius={18}
           fill={COLORS.windowShell}
-          stroke={COLORS.borderStrong}
-          lineWidth={3}
           shadowColor={
             COLORS.shadow
           }
@@ -1016,6 +1014,16 @@ export default makeScene2D(function* (view) {
             </Rect>
           </Rect>
         </Rect>
+
+        {/* Draw the outline after all clipped window contents so every edge has the same thickness. */}
+        <Rect
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
+          radius={18}
+          fill={'rgba(0,0,0,0)'}
+          stroke={COLORS.borderStrong}
+          lineWidth={3}
+        />
       </Node>
 
       {/*

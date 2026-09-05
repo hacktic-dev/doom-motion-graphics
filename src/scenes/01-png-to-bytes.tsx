@@ -230,8 +230,6 @@ export default makeScene2D(function* (view) {
           height={WINDOW_HEIGHT}
           radius={16}
           fill={COLORS.panelDeep}
-          stroke={COLORS.borderStrong}
-          lineWidth={3}
           shadowColor={COLORS.shadow}
           shadowBlur={22}
           shadowOffsetY={10}
@@ -282,6 +280,16 @@ export default makeScene2D(function* (view) {
             <PngPreview scale={3.15} />
           </Node>
         </Rect>
+
+        {/* Draw the window border after the clipped contents so the title bar cannot cover it. */}
+        <Rect
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
+          radius={16}
+          fill={'rgba(0,0,0,0)'}
+          stroke={COLORS.borderStrong}
+          lineWidth={3}
+        />
       </Node>
 
       {/* TEXT EDITOR WINDOW */}
@@ -297,8 +305,6 @@ export default makeScene2D(function* (view) {
           height={WINDOW_HEIGHT}
           radius={16}
           fill={COLORS.panelDeep}
-          stroke={COLORS.borderStrong}
-          lineWidth={3}
           shadowColor={COLORS.shadow}
           shadowBlur={22}
           shadowOffsetY={10}
@@ -357,6 +363,16 @@ export default makeScene2D(function* (view) {
             textAlign={'left'}
           />
         </Rect>
+
+        {/* Draw the window border after the clipped contents so the title bar cannot cover it. */}
+        <Rect
+          width={WINDOW_WIDTH}
+          height={WINDOW_HEIGHT}
+          radius={16}
+          fill={'rgba(0,0,0,0)'}
+          stroke={COLORS.borderStrong}
+          lineWidth={3}
+        />
       </Node>
     </Node>
   );

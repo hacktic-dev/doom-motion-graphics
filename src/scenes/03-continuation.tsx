@@ -253,8 +253,6 @@ export default makeScene2D(function* (view) {
           height={520}
           radius={18}
           fill={COLORS.windowShell}
-          stroke={COLORS.borderStrong}
-          lineWidth={3}
           shadowColor={COLORS.shadow}
           shadowBlur={24}
           shadowOffsetY={11}
@@ -331,6 +329,16 @@ export default makeScene2D(function* (view) {
             ),
           )}
         </Rect>
+
+        {/* Draw the outline last so the clipped title bar cannot obscure the top edge. */}
+        <Rect
+          width={1050}
+          height={520}
+          radius={18}
+          fill={'rgba(0,0,0,0)'}
+          stroke={COLORS.borderStrong}
+          lineWidth={3}
+        />
       </Node>
 
       {/* Characters that move from the bytes into the editor. */}
