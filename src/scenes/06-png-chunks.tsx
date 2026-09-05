@@ -49,10 +49,10 @@ const CHUNKS = [
 ] as const;
 
 const CONVENIENCE_STRIPS = [
-  {startX: -520, startY: -66, targetX: -10, targetY: -62, width: 180, color: COLORS.accent},
-  {startX: -550, startY: -18, targetX: 6, targetY: -26, width: 200, color: COLORS.purple},
-  {startX: -510, startY: 28, targetX: -6, targetY: 10, width: 168, color: '#735EE7'},
-  {startX: -545, startY: 72, targetX: 10, targetY: 42, width: 188, color: COLORS.accent},
+  {startX: -520, startY: -66, targetX: -8, targetY: -75, width: 180, color: COLORS.accent},
+  {startX: -550, startY: -18, targetX: 5, targetY: -55, width: 200, color: COLORS.purple},
+  {startX: -510, startY: 28, targetX: -5, targetY: -35, width: 168, color: '#735EE7'},
+  {startX: -545, startY: 72, targetX: 8, targetY: -15, width: 188, color: COLORS.accent},
 ] as const;
 
 const IMAGE_VIEW_WIDTH = 720;
@@ -520,7 +520,14 @@ function ShieldCheckIcon() {
 
 export default makeScene2D(function* (view) {
   const startFile = createRef<Node>();
-  const convenientFile = createRef<Node>();
+  const startFileShell = createRef<Node>();
+  const startFileBody = createRef<Line>();
+  const startFileFoldA = createRef<Line>();
+  const startFileFoldB = createRef<Line>();
+  const startFilePreview = createRef<Node>();
+  const startFileLabel = createRef<Txt>();
+  const startFusionBarRefs = Array.from({length: 6}, () => createRef<Rect>());
+
   const convenienceStripRefs = Array.from(
     {length: CONVENIENCE_STRIPS.length},
     () => createRef<Node>(),
@@ -555,29 +562,80 @@ export default makeScene2D(function* (view) {
 
   view.add(
     <Node>
-      {/* Exact handoff frame from Scene 5: same geometry, colours and effective scale. */}
+      {/* Exact Scene 5 handoff which physically morphs into the standard image.png icon. */}
       <Node ref={startFile} x={0} y={0} opacity={1} scale={1.50} zIndex={20}>
-        <Scene5HandoffFileShape />
-        {[
-          '#75b8ec',
-          COLORS.accent,
-          '#70b879',
-          '#a996ff',
-          '#f3c24f',
-          '#735ee7',
-        ].map((color, index) => (
-          <Rect
-            key={`fusion-${index}`}
-            width={105 - (index % 3) * 12}
-            height={13}
-            radius={7}
-            y={-32 + index * 20}
-            fill={color}
+        <Node ref={startFileShell} y={0}>
+          <Line
+            ref={startFileBody}
+            points={[
+              [-90, -112],
+              [38, -112],
+              [90, -60],
+              [90, 112],
+              [-90, 112],
+            ]}
+            closed
+            fill={'#343746'}
+            stroke={'#646B82'}
+            lineWidth={5}
+            radius={15}
+            shadowColor={'rgba(0,0,0,0.28)'}
+            shadowBlur={22}
+            shadowOffsetY={10}
           />
-        ))}
+
+          <Line
+            ref={startFileFoldA}
+            points={[[38, -112], [38, -60], [90, -60]]}
+            stroke={'#646B82'}
+            lineWidth={5}
+          />
+
+          <Line
+            ref={startFileFoldB}
+            points={[[38, -112], [90, -60]]}
+            stroke={'#646B82'}
+            lineWidth={5}
+          />
+
+          {[
+            '#75b8ec',
+            COLORS.accent,
+            '#70b879',
+            '#a996ff',
+            '#f3c24f',
+            '#735ee7',
+          ].map((color, index) => (
+            <Rect
+              ref={startFusionBarRefs[index]}
+              key={`fusion-${index}`}
+              width={105 - (index % 3) * 12}
+              height={13}
+              radius={7}
+              y={-32 + index * 20}
+              fill={color}
+            />
+          ))}
+
+          {/* Hidden at the first frame; revealed while the SAME file shell morphs. */}
+          <Node ref={startFilePreview} y={20} opacity={0}>
+            <PngPreview />
+          </Node>
+        </Node>
+
+        <Txt
+          ref={startFileLabel}
+          text={'image.png'}
+          fill={COLORS.text}
+          fontSize={34}
+          fontFamily={'Arial'}
+          fontWeight={500}
+          y={85}
+          opacity={0}
+        />
       </Node>
 
-      {/* A short visual beat showing why PNG is convenient before the chunk breakdown. */}
+      {/* HTML-like data strips that fly into the now-recognisable PNG file. */}
       {CONVENIENCE_STRIPS.map((strip, index) => (
         <Node
           ref={convenienceStripRefs[index]}
@@ -585,7 +643,7 @@ export default makeScene2D(function* (view) {
           x={strip.startX}
           y={strip.startY}
           opacity={0}
-          zIndex={12}
+          zIndex={22}
         >
           <Rect
             width={strip.width}
@@ -619,60 +677,6 @@ export default makeScene2D(function* (view) {
           />
         </Node>
       ))}
-
-      <Node ref={convenientFile} x={0} y={0} opacity={0} scale={1.42} zIndex={18}>
-        <Node y={-35}>
-          <Line
-            points={[
-              [-75, -90],
-              [35, -90],
-              [75, -50],
-              [75, 90],
-              [-75, 90],
-            ]}
-            closed
-            fill={COLORS.card}
-            stroke={COLORS.border}
-            lineWidth={4}
-            radius={12}
-            shadowColor={COLORS.shadow}
-            shadowBlur={22}
-            shadowOffsetY={10}
-          />
-
-          <Line
-            points={[
-              [35, -90],
-              [35, -50],
-              [75, -50],
-            ]}
-            stroke={COLORS.border}
-            lineWidth={4}
-          />
-
-          <Line
-            points={[
-              [35, -90],
-              [75, -50],
-            ]}
-            stroke={COLORS.border}
-            lineWidth={4}
-          />
-
-          <Node y={20}>
-            <PngPreview />
-          </Node>
-        </Node>
-
-        <Txt
-          text={'image.png'}
-          fill={COLORS.text}
-          fontSize={34}
-          fontFamily={'Arial'}
-          fontWeight={500}
-          y={85}
-        />
-      </Node>
 
       {/* Six consistent, larger named PNG chunks. */}
       <Node ref={chunkStage} opacity={0}>
@@ -910,18 +914,51 @@ export default makeScene2D(function* (view) {
     </Node>,
   );
 
-  // 0.00–0.55 — start exactly where Scene 5 ends so the cut still flows.
+  // 0.00–0.55 — start on the exact final frame of Scene 5.
   yield* waitFor(0.55);
 
-  // 0.55–1.15 — transform that same file into a recognisable image.png file.
+  // 0.55–1.15 — the SAME physical file turns into the standard image.png icon:
+  // the shell shrinks/morphs, the old coloured bars collapse, and PngPreview appears.
   yield* all(
-    startFile().position.y(-35, 0.60, easeInOutCubic),
-    startFile().scale(1.42, 0.60, easeOutCubic),
-    startFile().opacity(0, 0.50, easeInCubic),
-    convenientFile().opacity(1, 0.42, easeOutCubic),
+    startFile().scale(1.25, 0.60, easeInOutCubic),
+    startFileShell().y(-35, 0.60, easeInOutCubic),
+    startFileBody().points(
+      [
+        [-75, -90],
+        [35, -90],
+        [75, -50],
+        [75, 90],
+        [-75, 90],
+      ],
+      0.60,
+      easeInOutCubic,
+    ),
+    startFileFoldA().points(
+      [[35, -90], [35, -50], [75, -50]],
+      0.60,
+      easeInOutCubic,
+    ),
+    startFileFoldB().points(
+      [[35, -90], [75, -50]],
+      0.60,
+      easeInOutCubic,
+    ),
+    ...startFusionBarRefs.map(ref =>
+      all(
+        ref().opacity(0, 0.42, easeInCubic),
+        ref().scale([0.15, 1], 0.42, easeInCubic),
+      ),
+    ),
+    chain(
+      waitFor(0.12),
+      all(
+        startFilePreview().opacity(1, 0.34, easeOutCubic),
+        startFileLabel().opacity(1, 0.34, easeOutCubic),
+      ),
+    ),
   );
 
-  // 1.15–2.49 — extra code-like strips slide into the PNG while the preview stays unchanged.
+  // 1.15–2.49 — HTML-like data flies into the CENTER of the PNG file.
   yield* waitFor(0.20);
   yield* sequence(
     0.16,
@@ -934,20 +971,21 @@ export default makeScene2D(function* (view) {
             0.54,
             easeInOutCubic,
           ),
+          ref().scale(0.38, 0.54, easeInCubic),
           ref().opacity(0, 0.54, easeInCubic),
         ),
       ),
     ),
   );
 
-  // 2.49–4.00 — a small settle on the finished PNG file before we explain chunks.
+  // 2.49–4.00 — let the normal-looking PNG settle briefly.
   yield* chain(
-    convenientFile().scale(1.54, 0.18, easeOutCubic),
-    convenientFile().scale(1.50, 0.18, easeInOutCubic),
+    startFile().scale(1.29, 0.18, easeOutCubic),
+    startFile().scale(1.25, 0.18, easeInOutCubic),
   );
   yield* waitFor(1.15);
 
-  // 4.00–4.82 — now the PNG breaks apart into six matching, named chunks.
+  // 4.00–5.07 — the PNG now breaks apart into six matching, named chunks.
   yield* all(
     sequence(
       0.07,
@@ -960,11 +998,11 @@ export default makeScene2D(function* (view) {
       ),
     ),
     chunkStage().opacity(1, 0.18, easeOutCubic),
-    convenientFile().opacity(0, 0.60, easeInCubic),
-    convenientFile().scale(1.18, 0.82, easeInCubic),
+    startFile().opacity(0, 0.60, easeInCubic),
+    startFile().scale(1.02, 0.82, easeInCubic),
   );
 
-  // 4.82–8.32 — hold on all six PNG chunks for 3.5 seconds.
+  // 5.07–8.57 — hold on all six PNG chunks for 3.5 seconds.
   yield* waitFor(3.50);
 
   // 8.32–8.94 — choose one IDAT chunk and bring the same object to the centre.
@@ -1012,30 +1050,32 @@ export default makeScene2D(function* (view) {
     ),
   );
 
-  // The emphasis timings are shifted earlier to match the voiceover more closely.
+  // Actual section start here is ~10.01s.
+  // Type highlight: 10.51s (0.40s earlier than before).
   yield* waitFor(0.50);
-
   yield* chain(
     typePart().scale(1.08, 0.28, easeOutCubic),
     typePart().scale(1, 0.20, easeInOutCubic),
   );
-  yield* waitFor(0.20);
 
+  // Data highlight: 11.19s (0.95s earlier than before).
+  yield* waitFor(0.20);
   yield* chain(
     dataPart().scale(1.08, 0.28, easeOutCubic),
     dataPart().scale(1, 0.20, easeInOutCubic),
   );
-  yield* waitFor(0.60);
 
+  // Check highlight: 12.27s (1.10s earlier than before).
+  yield* waitFor(0.60);
   yield* chain(
     checkPart().scale(1.08, 0.28, easeOutCubic),
     checkPart().scale(1, 0.20, easeInOutCubic),
   );
 
-  // Shorter hold: we cut 1.4 seconds from this section so Scene 6 ends earlier too.
+  // Transition to the pixel/image section at 16.61s, exactly 1.40s earlier.
+  // That 1.40s is removed from Scene 6 rather than added back later.
   yield* waitFor(3.86);
 
-  // Move into the image-data example 1.4 seconds earlier than before.
   yield* all(
     focusChunk().opacity(0, 0.34, easeInCubic),
     focusChunk().scale(0.76, 0.42, easeInCubic),
@@ -1048,11 +1088,10 @@ export default makeScene2D(function* (view) {
     imageCard().scale(1, 0.50, easeOutCubic),
   );
 
-  yield* waitFor(0.20);
-
-  // Pixels stream from the two IDAT chunks and build the grid.
+  // Pixels stream from the two IDAT chunks and build the grid faster now.
+  // The image should begin appearing within about 1.34 seconds of this section starting.
   yield* sequence(
-    0.006,
+    0.0029,
     ...pixelRefs.map((ref, index) => {
       const col = index % PIXEL_COLS;
       const row = Math.floor(index / PIXEL_COLS);
@@ -1070,9 +1109,7 @@ export default makeScene2D(function* (view) {
     }),
   );
 
-  yield* waitFor(0.20);
-
-  // 20.40–20.90 — the completed pixel grid becomes the actual mountain image.
+  // The completed pixel grid becomes the actual mountain image.
   yield* all(
     ...pixelRefs.map(ref => ref().opacity(0, 0.48, easeInCubic)),
     landscapePreview().opacity(1, 0.50, easeOutCubic),
@@ -1080,6 +1117,6 @@ export default makeScene2D(function* (view) {
     imageChunkB().opacity(0, 0.40, easeInCubic),
   );
 
-  // Finish the ~3.5s image-data section on the resolved image.
-  yield* waitFor(0.28);
+  // Hold on the finished image for about half a second at the end of Scene 6.
+  yield* waitFor(0.50);
 });
