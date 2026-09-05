@@ -58,7 +58,7 @@ export default makeScene2D(function* (view) {
         text={''}
         fill={COLORS.text}
         fontSize={73}
-        fontFamily={'Courier New'}
+        fontFamily={'monospace'}
         fontWeight={700}
         textAlign={'center'}
         width={PILL_WIDTH - 88}

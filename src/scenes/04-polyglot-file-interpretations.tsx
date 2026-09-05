@@ -1039,7 +1039,7 @@ export default makeScene2D(function* (view) {
           text={''}
           fill={COLORS.text}
           fontSize={58}
-          fontFamily={'Courier New'}
+          fontFamily={'monospace'}
           fontWeight={700}
           textAlign={'center'}
           width={POLYGLOT_PILL_WIDTH - 70}
