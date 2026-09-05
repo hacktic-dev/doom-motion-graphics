@@ -17,14 +17,19 @@ import {
   waitFor,
 } from '@motion-canvas/core';
 
+import {PngPreview} from '../components/PngPreview';
+
 
 const COLORS = {
   background: '#21232E',
   card: '#3A3E52',
   panel: '#4A5066',
+  titlebar: '#1B1D26',
+  borderStrong: '#646B82',
   border: '#69708D',
   text: '#F4F6FA',
   textMuted: '#C4CBDA',
+  titleText: '#C4CBDA',
   accent: '#8C7CFF',
   blue: '#75B8EC',
   green: '#70B879',
@@ -43,9 +48,20 @@ const CHUNKS = [
   {name: 'IEND', color: COLORS.yellow, x: 600, y: 250},
 ] as const;
 
+const CONVENIENCE_STRIPS = [
+  {startX: -520, startY: -66, targetX: -10, targetY: -62, width: 180, color: COLORS.accent},
+  {startX: -550, startY: -18, targetX: 6, targetY: -26, width: 200, color: COLORS.purple},
+  {startX: -510, startY: 28, targetX: -6, targetY: 10, width: 168, color: '#735EE7'},
+  {startX: -545, startY: 72, targetX: 10, targetY: 42, width: 188, color: COLORS.accent},
+] as const;
+
 const IMAGE_VIEW_WIDTH = 720;
 const IMAGE_VIEW_HEIGHT = 480;
 const IMAGE_CARD_SCALE = 0.86;
+const IMAGE_WINDOW_WIDTH = 800;
+const IMAGE_WINDOW_HEIGHT = 620;
+const TITLEBAR_HEIGHT = 58;
+const TITLEBAR_Y = -IMAGE_WINDOW_HEIGHT / 2 + TITLEBAR_HEIGHT / 2;
 const LANDSCAPE_BASE_SIZE = 720;
 const LANDSCAPE_UNIFORM_SCALE = IMAGE_VIEW_HEIGHT / LANDSCAPE_BASE_SIZE;
 const LANDSCAPE_X_SCALE = IMAGE_VIEW_WIDTH / IMAGE_VIEW_HEIGHT;
@@ -232,6 +248,40 @@ function Scene4Landscape() {
           </Node>
         ))}
       </Node>
+    </Node>
+  );
+}
+
+function Scene5HandoffFileShape() {
+  return (
+    <Node>
+      <Line
+        points={[
+          [-90, -112],
+          [38, -112],
+          [90, -60],
+          [90, 112],
+          [-90, 112],
+        ]}
+        closed
+        fill={'#343746'}
+        stroke={'#646B82'}
+        lineWidth={5}
+        radius={15}
+        shadowColor={'rgba(0,0,0,0.28)'}
+        shadowBlur={22}
+        shadowOffsetY={10}
+      />
+      <Line
+        points={[[38, -112], [38, -60], [90, -60]]}
+        stroke={'#646B82'}
+        lineWidth={5}
+      />
+      <Line
+        points={[[38, -112], [90, -60]]}
+        stroke={'#646B82'}
+        lineWidth={5}
+      />
     </Node>
   );
 }
@@ -470,6 +520,11 @@ function ShieldCheckIcon() {
 
 export default makeScene2D(function* (view) {
   const startFile = createRef<Node>();
+  const convenientFile = createRef<Node>();
+  const convenienceStripRefs = Array.from(
+    {length: CONVENIENCE_STRIPS.length},
+    () => createRef<Node>(),
+  );
 
   const chunkStage = createRef<Node>();
   const chunkRefs = Array.from({length: CHUNKS.length}, () => createRef<Node>());
@@ -500,9 +555,9 @@ export default makeScene2D(function* (view) {
 
   view.add(
     <Node>
-      {/* Exact handoff frame from Scene 5. */}
-      <Node ref={startFile} x={0} y={0} opacity={1} scale={1.20} zIndex={20}>
-        <FileShape />
+      {/* Exact handoff frame from Scene 5: same geometry, colours and effective scale. */}
+      <Node ref={startFile} x={0} y={0} opacity={1} scale={1.50} zIndex={20}>
+        <Scene5HandoffFileShape />
         {[
           '#75b8ec',
           COLORS.accent,
@@ -520,6 +575,103 @@ export default makeScene2D(function* (view) {
             fill={color}
           />
         ))}
+      </Node>
+
+      {/* A short visual beat showing why PNG is convenient before the chunk breakdown. */}
+      {CONVENIENCE_STRIPS.map((strip, index) => (
+        <Node
+          ref={convenienceStripRefs[index]}
+          key={`convenience-strip-${index}`}
+          x={strip.startX}
+          y={strip.startY}
+          opacity={0}
+          zIndex={12}
+        >
+          <Rect
+            width={strip.width}
+            height={26}
+            radius={13}
+            fill={strip.color}
+            shadowColor={COLORS.shadow}
+            shadowBlur={12}
+            shadowOffsetY={6}
+          />
+          <Rect
+            x={-strip.width / 2 + 28}
+            width={22}
+            height={10}
+            radius={5}
+            fill={'rgba(255,255,255,0.24)'}
+          />
+          <Rect
+            x={-strip.width / 2 + 58}
+            width={50}
+            height={10}
+            radius={5}
+            fill={'rgba(255,255,255,0.18)'}
+          />
+          <Rect
+            x={-strip.width / 2 + 116}
+            width={36}
+            height={10}
+            radius={5}
+            fill={'rgba(255,255,255,0.18)'}
+          />
+        </Node>
+      ))}
+
+      <Node ref={convenientFile} x={0} y={0} opacity={0} scale={1.42} zIndex={18}>
+        <Node y={-35}>
+          <Line
+            points={[
+              [-75, -90],
+              [35, -90],
+              [75, -50],
+              [75, 90],
+              [-75, 90],
+            ]}
+            closed
+            fill={COLORS.card}
+            stroke={COLORS.border}
+            lineWidth={4}
+            radius={12}
+            shadowColor={COLORS.shadow}
+            shadowBlur={22}
+            shadowOffsetY={10}
+          />
+
+          <Line
+            points={[
+              [35, -90],
+              [35, -50],
+              [75, -50],
+            ]}
+            stroke={COLORS.border}
+            lineWidth={4}
+          />
+
+          <Line
+            points={[
+              [35, -90],
+              [75, -50],
+            ]}
+            stroke={COLORS.border}
+            lineWidth={4}
+          />
+
+          <Node y={20}>
+            <PngPreview />
+          </Node>
+        </Node>
+
+        <Txt
+          text={'image.png'}
+          fill={COLORS.text}
+          fontSize={34}
+          fontFamily={'Arial'}
+          fontWeight={500}
+          y={85}
+        />
       </Node>
 
       {/* Six consistent, larger named PNG chunks. */}
@@ -669,32 +821,32 @@ export default makeScene2D(function* (view) {
         <Node ref={imageCard} x={360} y={0} opacity={0} scale={IMAGE_CARD_SCALE}>
           {/* A real image-viewer style window, matching the visual language of the earlier windows. */}
           <Rect
-            width={800}
-            height={620}
+            width={IMAGE_WINDOW_WIDTH}
+            height={IMAGE_WINDOW_HEIGHT}
             radius={34}
             fill={COLORS.card}
-            stroke={COLORS.border}
-            lineWidth={5}
             shadowColor={COLORS.shadow}
             shadowBlur={28}
             shadowOffsetY={12}
             clip
           >
             <Rect
-              width={800}
-              height={64}
-              y={-278}
-              fill={'#2C2F3B'}
+              width={IMAGE_WINDOW_WIDTH}
+              height={TITLEBAR_HEIGHT}
+              y={TITLEBAR_Y}
+              fill={COLORS.titlebar}
             />
-            <Circle width={17} height={17} x={-350} y={-278} fill={'#ff5f57'} />
-            <Circle width={17} height={17} x={-318} y={-278} fill={'#febc2e'} />
-            <Circle width={17} height={17} x={-286} y={-278} fill={'#28c840'} />
+            <Circle width={15} height={15} x={-IMAGE_WINDOW_WIDTH / 2 + 32} y={TITLEBAR_Y} fill={'#ff5f57'} />
+            <Circle width={15} height={15} x={-IMAGE_WINDOW_WIDTH / 2 + 58} y={TITLEBAR_Y} fill={'#febc2e'} />
+            <Circle width={15} height={15} x={-IMAGE_WINDOW_WIDTH / 2 + 84} y={TITLEBAR_Y} fill={'#28c840'} />
             <Txt
               text={'image.png'}
-              y={-278}
-              fill={COLORS.textMuted}
+              x={0}
+              y={TITLEBAR_Y}
+              fill={COLORS.titleText}
               fontFamily={'monospace'}
               fontSize={24}
+              textAlign={'center'}
             />
 
             {/* No visible inner panel: pixels and final image sit directly on the
@@ -712,6 +864,16 @@ export default makeScene2D(function* (view) {
               </Node>
             </Rect>
           </Rect>
+
+          {/* Border overlay keeps the outline equally thick across the title bar and body. */}
+          <Rect
+            width={IMAGE_WINDOW_WIDTH}
+            height={IMAGE_WINDOW_HEIGHT}
+            radius={34}
+            fill={'rgba(0,0,0,0)'}
+            stroke={COLORS.borderStrong}
+            lineWidth={3}
+          />
         </Node>
 
         {Array.from({length: PIXEL_COUNT}, (_, index) => {
@@ -748,10 +910,44 @@ export default makeScene2D(function* (view) {
     </Node>,
   );
 
-  // 0.00–0.80 — exact handoff from Scene 5.
-  yield* waitFor(0.80);
+  // 0.00–0.55 — start exactly where Scene 5 ends so the cut still flows.
+  yield* waitFor(0.55);
 
-  // The file visibly breaks apart into six matching, named chunks.
+  // 0.55–1.15 — transform that same file into a recognisable image.png file.
+  yield* all(
+    startFile().position.y(-35, 0.60, easeInOutCubic),
+    startFile().scale(1.42, 0.60, easeOutCubic),
+    startFile().opacity(0, 0.50, easeInCubic),
+    convenientFile().opacity(1, 0.42, easeOutCubic),
+  );
+
+  // 1.15–2.49 — extra code-like strips slide into the PNG while the preview stays unchanged.
+  yield* waitFor(0.20);
+  yield* sequence(
+    0.16,
+    ...convenienceStripRefs.map((ref, index) =>
+      chain(
+        ref().opacity(1, 0.12, easeOutCubic),
+        all(
+          ref().position(
+            [CONVENIENCE_STRIPS[index].targetX, CONVENIENCE_STRIPS[index].targetY],
+            0.54,
+            easeInOutCubic,
+          ),
+          ref().opacity(0, 0.54, easeInCubic),
+        ),
+      ),
+    ),
+  );
+
+  // 2.49–4.00 — a small settle on the finished PNG file before we explain chunks.
+  yield* chain(
+    convenientFile().scale(1.54, 0.18, easeOutCubic),
+    convenientFile().scale(1.50, 0.18, easeInOutCubic),
+  );
+  yield* waitFor(1.15);
+
+  // 4.00–4.82 — now the PNG breaks apart into six matching, named chunks.
   yield* all(
     sequence(
       0.07,
@@ -764,15 +960,14 @@ export default makeScene2D(function* (view) {
       ),
     ),
     chunkStage().opacity(1, 0.18, easeOutCubic),
-    chain(
-      waitFor(0.20),
-      startFile().opacity(0, 0.60, easeInCubic),
-    ),
-    startFile().scale(0.48, 0.82, easeInCubic),
+    convenientFile().opacity(0, 0.60, easeInCubic),
+    convenientFile().scale(1.18, 0.82, easeInCubic),
   );
-  yield* waitFor(1.20);
 
-  // Choose the IDAT chunk and bring the same object to the centre.
+  // 4.82–8.32 — hold on all six PNG chunks for 3.5 seconds.
+  yield* waitFor(3.50);
+
+  // 8.32–8.94 — choose one IDAT chunk and bring the same object to the centre.
   yield* all(
     ...chunkRefs.map((ref, index) =>
       index === 2
@@ -786,9 +981,8 @@ export default makeScene2D(function* (view) {
           ),
     ),
   );
-  yield* waitFor(0.28);
 
-  // Physically expand the selected chunk into type/data/check.
+  // 8.94–9.68 — physically expand that same chunk into type / data / check.
   yield* all(
     focusShell().width(1420, 0.74, easeInOutCubic),
     focusShell().height(470, 0.74, easeInOutCubic),
@@ -817,30 +1011,31 @@ export default makeScene2D(function* (view) {
       ),
     ),
   );
-  yield* waitFor(0.80);
 
-  // Make the three ideas land with the exact same small expansion.
+  // The emphasis timings are shifted earlier to match the voiceover more closely.
+  yield* waitFor(0.50);
+
   yield* chain(
     typePart().scale(1.08, 0.28, easeOutCubic),
     typePart().scale(1, 0.20, easeInOutCubic),
   );
-  yield* waitFor(0.46);
+  yield* waitFor(0.20);
 
   yield* chain(
     dataPart().scale(1.08, 0.28, easeOutCubic),
     dataPart().scale(1, 0.20, easeInOutCubic),
   );
-  yield* waitFor(0.54);
+  yield* waitFor(0.60);
 
   yield* chain(
     checkPart().scale(1.08, 0.28, easeOutCubic),
     checkPart().scale(1, 0.20, easeInOutCubic),
   );
 
-  // Extra hold preserves the scene's existing overall timing.
-  yield* waitFor(1.48);
+  // Shorter hold: we cut 1.4 seconds from this section so Scene 6 ends earlier too.
+  yield* waitFor(3.86);
 
-  // Switch to the image-data example.
+  // Move into the image-data example 1.4 seconds earlier than before.
   yield* all(
     focusChunk().opacity(0, 0.34, easeInCubic),
     focusChunk().scale(0.76, 0.42, easeInCubic),
@@ -850,19 +1045,18 @@ export default makeScene2D(function* (view) {
     imageChunkB().opacity(1, 0.30, easeOutCubic),
     imageChunkB().scale(1, 0.44, easeOutCubic),
     imageCard().opacity(1, 0.34, easeOutCubic),
-    imageCard().scale(1, 0.52, easeOutCubic),
+    imageCard().scale(1, 0.50, easeOutCubic),
   );
-  yield* waitFor(0.46);
 
-  // Pixels stream from the IDAT chunks and fill a complete grid.
+  yield* waitFor(0.20);
+
+  // Pixels stream from the two IDAT chunks and build the grid.
   yield* sequence(
-    0.00666,
+    0.006,
     ...pixelRefs.map((ref, index) => {
       const col = index % PIXEL_COLS;
       const row = Math.floor(index / PIXEL_COLS);
 
-      // 17x11, 34px cells on a 40px pitch. This leaves only a small,
-      // even margin around the grid and matches the final image area better.
       const targetX = 40 + col * 40;
       const targetY = -164 + row * 40;
 
@@ -876,24 +1070,16 @@ export default makeScene2D(function* (view) {
     }),
   );
 
-  yield* waitFor(0.28);
+  yield* waitFor(0.20);
 
-  // The finished grid dissolves into the same mountain scene used in Scene 4.
+  // 20.40–20.90 — the completed pixel grid becomes the actual mountain image.
   yield* all(
     ...pixelRefs.map(ref => ref().opacity(0, 0.48, easeInCubic)),
-    landscapePreview().opacity(1, 0.54, easeOutCubic),
-  );
-  yield* waitFor(0.68);
-
-  // Hold briefly on the completed image, then end the scene.
-  yield* waitFor(0.68);
-
-  // Clear the source IDAT chunks while keeping the image viewer on screen.
-  yield* all(
-    imageChunkA().opacity(0, 0.30, easeInCubic),
-    imageChunkB().opacity(0, 0.30, easeInCubic),
+    landscapePreview().opacity(1, 0.50, easeOutCubic),
+    imageChunkA().opacity(0, 0.40, easeInCubic),
+    imageChunkB().opacity(0, 0.40, easeInCubic),
   );
 
-  // Net result: Scene 6 is shortened by 7 seconds.
-  yield* waitFor(0.95);
+  // Finish the ~3.5s image-data section on the resolved image.
+  yield* waitFor(0.28);
 });
