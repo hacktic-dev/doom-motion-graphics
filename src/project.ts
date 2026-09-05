@@ -5,6 +5,7 @@ import fileBytesAndPrograms from './scenes/01-file-bytes-and-programs?scene';
 import reconstructingPngData from './scenes/02-reconstructing-png-data?scene';
 import rawBytesAsText from './scenes/03-raw-bytes-as-text?scene';
 import polyglotFileInterpretations from './scenes/04-polyglot-file-interpretations?scene';
+import htmlDoomAndPng from './scenes/05-html-doom-and-png?scene';
 
 export default makeProject({
   scenes: [
@@ -13,5 +14,6 @@ export default makeProject({
     reconstructingPngData,
     rawBytesAsText,
     polyglotFileInterpretations,
+    htmlDoomAndPng,
   ],
 });
