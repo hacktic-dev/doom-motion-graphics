@@ -7,6 +7,7 @@ import rawBytesAsText from './scenes/03-raw-bytes-as-text?scene';
 import polyglotFileInterpretations from './scenes/04-polyglot-file-interpretations?scene';
 import htmlDoomAndPng from './scenes/05-html-doom-and-png?scene';
 import pngChunks from './scenes/06-png-chunks?scene';
+import pngMetadata from './scenes/07-png-metadata?scene';
 
 export default makeProject({
   scenes: [
@@ -17,5 +18,6 @@ export default makeProject({
     polyglotFileInterpretations,
     htmlDoomAndPng,
 	pngChunks,
+	pngMetadata,
   ],
 });
