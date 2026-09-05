@@ -29,6 +29,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
+  titleText: '#C4CBDA',
   shadow: 'rgba(0,0,0,0.28)',
   shadowSoft: 'rgba(0,0,0,0.28)',
 };
@@ -274,12 +275,10 @@ export default makeScene2D(function* (view) {
             text={'Image Viewer'}
             x={0}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
-            width={308}
             fontSize={24}
-            fontFamily={'Arial'}
-            fontWeight={600}
-            fill={COLORS.text}
-            textAlign={'left'}
+            fontFamily={'monospace'}
+            fill={COLORS.titleText}
+            textAlign={'center'}
           />
 
           <Node y={24}>
@@ -349,12 +348,10 @@ export default makeScene2D(function* (view) {
             text={'Text Editor'}
             x={0}
             y={-(WINDOW_HEIGHT / 2) + TITLEBAR_HEIGHT / 2}
-            width={308}
             fontSize={24}
-            fontFamily={'Arial'}
-            fontWeight={600}
-            fill={COLORS.text}
-            textAlign={'left'}
+            fontFamily={'monospace'}
+            fill={COLORS.titleText}
+            textAlign={'center'}
           />
 
           <Txt

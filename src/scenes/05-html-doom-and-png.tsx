@@ -32,6 +32,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
+  titleText: '#C4CBDA',
   accent: '#8C7CFF',
   shadow: 'rgba(0,0,0,0.28)',
 };
@@ -163,16 +164,18 @@ export default makeScene2D(function* (view) {
           clip
         >
           <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={TITLEBAR_Y} fill={COLORS.titlebar} />
-          <Circle width={17} height={17} x={-580} y={TITLEBAR_Y} fill={'#ff5f57'} />
-          <Circle width={17} height={17} x={-550} y={TITLEBAR_Y} fill={'#febc2e'} />
-          <Circle width={17} height={17} x={-520} y={TITLEBAR_Y} fill={'#28c840'} />
+          <Circle width={15} height={15} x={-WINDOW_WIDTH / 2 + 32} y={TITLEBAR_Y} fill={'#ff5f57'} />
+          <Circle width={15} height={15} x={-WINDOW_WIDTH / 2 + 58} y={TITLEBAR_Y} fill={'#febc2e'} />
+          <Circle width={15} height={15} x={-WINDOW_WIDTH / 2 + 84} y={TITLEBAR_Y} fill={'#28c840'} />
           <Rect width={820} height={36} y={TITLEBAR_Y} radius={9} fill={COLORS.panel} />
           <Txt
             text={'doom.html'}
+            x={0}
             y={TITLEBAR_Y}
-            fill={COLORS.textMuted}
+            fill={COLORS.titleText}
             fontSize={22}
             fontFamily={'monospace'}
+            textAlign={'center'}
           />
           <Rect width={CONTENT_WIDTH} height={CONTENT_HEIGHT} y={CONTENT_Y} radius={12} fill={'#11131A'} clip>
             <Node ref={browserTag} y={-22} scale={2.15}>
@@ -210,7 +213,7 @@ export default makeScene2D(function* (view) {
           radius={20}
           fill={'rgba(0,0,0,0)'}
           stroke={COLORS.borderStrong}
-          lineWidth={4}
+          lineWidth={3}
         />
       </Node>
 

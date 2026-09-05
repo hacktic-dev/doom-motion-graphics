@@ -22,6 +22,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
+  titleText: '#C4CBDA',
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
@@ -282,7 +283,7 @@ export default makeScene2D(function* (view) {
           <Circle
             width={15}
             height={15}
-            x={-495}
+            x={-525 + 32}
             y={-234}
             fill={'#ff5f57'}
           />
@@ -290,7 +291,7 @@ export default makeScene2D(function* (view) {
           <Circle
             width={15}
             height={15}
-            x={-469}
+            x={-525 + 58}
             y={-234}
             fill={'#febc2e'}
           />
@@ -298,21 +299,19 @@ export default makeScene2D(function* (view) {
           <Circle
             width={15}
             height={15}
-            x={-443}
+            x={-525 + 84}
             y={-234}
             fill={'#28c840'}
           />
 
           <Txt
             text={'image.png — Text Editor'}
-            x={-303}
+            x={0}
             y={-234}
-            width={245}
             fontSize={27}
-            fontFamily={'Arial'}
-            fontWeight={600}
-            fill={COLORS.text}
-            textAlign={'left'}
+            fontFamily={'monospace'}
+            fill={COLORS.titleText}
+            textAlign={'center'}
           />
 
           {continuationCharacters.map(

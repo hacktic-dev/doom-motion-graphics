@@ -153,6 +153,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
+  titleText: '#C4CBDA',
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
@@ -611,17 +612,15 @@ export default makeScene2D(function* (view) {
           <Txt
   ref={programTitle}
   text={'Image Viewer'}
-  x={-289}
+  x={0}
   y={
     -WINDOW_HEIGHT / 2 +
     TITLEBAR_HEIGHT / 2
   }
-  width={350}
   fontSize={28}
-  fontFamily={'Arial'}
-  fontWeight={600}
-  fill={COLORS.text}
-  textAlign={'left'}
+  fontFamily={'monospace'}
+  fill={COLORS.titleText}
+  textAlign={'center'}
 />
 
           {/*

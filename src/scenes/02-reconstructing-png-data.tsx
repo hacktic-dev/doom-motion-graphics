@@ -21,6 +21,7 @@ const COLORS = {
   borderStrong: '#646B82',
   text: '#F4F6FA',
   textMuted: '#AEB5C6',
+  titleText: '#C4CBDA',
   mutedBar: '#697187',
   accent: '#8C7CFF',
   accentGlow: 'rgba(140,124,255,0.24)',
@@ -89,7 +90,7 @@ function PreviousSceneState({
           <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.panelDeep} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
             <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
             <WindowControls />
-            <Txt text={'Image Viewer'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
+            <Txt text={'Image Viewer'} x={0} y={-149} fontSize={24} fontFamily={'monospace'} fill={COLORS.titleText} textAlign={'center'} />
             <Node y={21}><PngPreview scale={3.15} /></Node>
           </Rect>
           {/* Border overlay stays outside the clipped shell, keeping all four edges equally thick. */}
@@ -100,7 +101,7 @@ function PreviousSceneState({
           <Rect width={WINDOW_WIDTH} height={WINDOW_HEIGHT} radius={16} fill={COLORS.panelDeep} shadowColor={COLORS.shadow} shadowBlur={22} shadowOffsetY={10} clip>
             <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-149} fill={COLORS.titlebar} />
             <WindowControls />
-            <Txt text={'Text Editor'} width={308} y={-149} fontSize={24} fontFamily={'Arial'} fontWeight={600} fill={COLORS.text} textAlign={'left'} />
+            <Txt text={'Text Editor'} x={0} y={-149} fontSize={24} fontFamily={'monospace'} fill={COLORS.titleText} textAlign={'center'} />
             <Txt text={'%PNG....IHDR...........sRGB\n....gAMA........IDATx....'} y={-65} width={440} fontSize={30} lineHeight={42} fontFamily={'monospace'} fill={COLORS.code} textAlign={'left'} />
           </Rect>
           {/* Border overlay stays outside the clipped shell, keeping all four edges equally thick. */}
