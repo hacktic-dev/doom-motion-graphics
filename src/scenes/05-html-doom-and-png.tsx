@@ -1,10 +1,10 @@
 import {
   Circle,
-  Img,
   Line,
   Node,
   Rect,
   Txt,
+  Video,
   makeScene2D,
 } from '@motion-canvas/2d';
 import {
@@ -18,7 +18,7 @@ import {
 } from '@motion-canvas/core';
 
 import {PngPreview} from '../components/PngPreview';
-import doomScreenshot from '../img/doom.png';
+import gameplayVideo from '../img/gameplay.mp4';
 
 const COLORS = {
   background: '#21232E',
@@ -121,7 +121,7 @@ function FileShape({kind}: {kind: 'html' | 'png' | 'unknown'}) {
 export default makeScene2D(function* (view) {
   const htmlFile = createRef<Node>();
   const browser = createRef<Node>();
-  const doomArtwork = createRef<Img>();
+  const doomArtwork = createRef<Video>();
   const pngFile = createRef<Node>();
   const plus = createRef<Txt>();
   const destination = createRef<Node>();
@@ -192,10 +192,12 @@ export default makeScene2D(function* (view) {
                 lineWidth={3}
               />
             </Node>
-            <Img
+            <Video
               ref={doomArtwork}
-              src={doomScreenshot}
+              src={gameplayVideo}
               width={CONTENT_WIDTH}
+              height={CONTENT_HEIGHT}
+              time={16}
               opacity={0}
             />
           </Rect>
@@ -295,6 +297,8 @@ export default makeScene2D(function* (view) {
   );
 
   // 2.35–3.00: pressing play replaces the HTML mark with the running program.
+  doomArtwork().seek(16);
+  doomArtwork().play();
   yield* all(
     chain(
       playButton().scale(0.82, 0.10, easeInCubic),
@@ -321,6 +325,7 @@ export default makeScene2D(function* (view) {
       ),
     ),
   );
+  doomArtwork().pause();
 
   // 7.05–9.00: hold on the single packaged file.
   yield* waitFor(1.95);
