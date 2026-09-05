@@ -2,6 +2,7 @@ import {
   Circle,
   Line,
   Node,
+  Path,
   Rect,
   Txt,
   Video,
@@ -14,6 +15,7 @@ import {
   easeInCubic,
   easeInOutCubic,
   easeOutCubic,
+  sequence,
   waitFor,
 } from '@motion-canvas/core';
 
@@ -34,11 +36,23 @@ const COLORS = {
   shadow: 'rgba(0,0,0,0.28)',
 };
 
-const WINDOW_WIDTH = 1160;
-const WINDOW_HEIGHT = 842;
 const TITLEBAR_HEIGHT = 58;
-const CONTENT_WIDTH = 1096;
+const CONTENT_MARGIN = 32;
+// The source is a 16:9 encode containing a centred 4:3 gameplay image.
+// The video is drawn at 1280px wide. A 1140px mask removes the encoded black
+// side bars while retaining Doom's green frame on both active-image edges.
+// Raise this to reveal more edge; lower it to crop farther inward.
+const CONTENT_WIDTH = 1140;
 const CONTENT_HEIGHT = 720;
+const GAMEPLAY_WIDTH = 1280;
+const WINDOW_WIDTH = CONTENT_WIDTH + CONTENT_MARGIN * 2;
+const WINDOW_HEIGHT = TITLEBAR_HEIGHT + CONTENT_HEIGHT + CONTENT_MARGIN * 2;
+const TITLEBAR_Y = -WINDOW_HEIGHT / 2 + TITLEBAR_HEIGHT / 2;
+const CONTENT_Y =
+  -WINDOW_HEIGHT / 2 +
+  TITLEBAR_HEIGHT +
+  CONTENT_MARGIN +
+  CONTENT_HEIGHT / 2;
 
 function HtmlTag() {
   return (
@@ -104,16 +118,6 @@ function FileShape({kind}: {kind: 'html' | 'png' | 'unknown'}) {
 
       {kind === 'png' ? <Node y={18} scale={1.22}><PngPreview /></Node> : null}
 
-      {kind === 'unknown' ? (
-        <Txt
-          text={'?'}
-          y={16}
-          fill={COLORS.textMuted}
-          fontSize={76}
-          fontFamily={'Arial'}
-          fontWeight={700}
-        />
-      ) : null}
     </Node>
   );
 }
@@ -123,10 +127,9 @@ export default makeScene2D(function* (view) {
   const browser = createRef<Node>();
   const doomArtwork = createRef<Video>();
   const pngFile = createRef<Node>();
-  const plus = createRef<Txt>();
   const destination = createRef<Node>();
-  const leftPath = createRef<Line>();
-  const rightPath = createRef<Line>();
+  const braidRefs = Array.from({length: 6}, () => createRef<Path>());
+  const fusionBarRefs = Array.from({length: 6}, () => createRef<Rect>());
   const browserTag = createRef<Node>();
   const playButton = createRef<Node>();
 
@@ -148,7 +151,7 @@ export default makeScene2D(function* (view) {
         />
       </Node>
 
-      <Node ref={browser} opacity={0} scale={[0.155, 0.266]}>
+      <Node ref={browser} opacity={0} scale={[0.15, 0.266]}>
         <Rect
           width={WINDOW_WIDTH}
           height={WINDOW_HEIGHT}
@@ -159,19 +162,19 @@ export default makeScene2D(function* (view) {
           shadowOffsetY={10}
           clip
         >
-          <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={-392} fill={COLORS.titlebar} />
-          <Circle width={17} height={17} x={-550} y={-392} fill={'#ff5f57'} />
-          <Circle width={17} height={17} x={-520} y={-392} fill={'#febc2e'} />
-          <Circle width={17} height={17} x={-490} y={-392} fill={'#28c840'} />
-          <Rect width={760} height={36} y={-392} radius={9} fill={COLORS.panel} />
+          <Rect width={WINDOW_WIDTH} height={TITLEBAR_HEIGHT} y={TITLEBAR_Y} fill={COLORS.titlebar} />
+          <Circle width={17} height={17} x={-590} y={TITLEBAR_Y} fill={'#ff5f57'} />
+          <Circle width={17} height={17} x={-560} y={TITLEBAR_Y} fill={'#febc2e'} />
+          <Circle width={17} height={17} x={-530} y={TITLEBAR_Y} fill={'#28c840'} />
+          <Rect width={820} height={36} y={TITLEBAR_Y} radius={9} fill={COLORS.panel} />
           <Txt
             text={'doom.html'}
-            y={-392}
+            y={TITLEBAR_Y}
             fill={COLORS.textMuted}
             fontSize={22}
             fontFamily={'monospace'}
           />
-          <Rect width={CONTENT_WIDTH} height={CONTENT_HEIGHT} y={32} radius={12} fill={'#11131A'} clip>
+          <Rect width={CONTENT_WIDTH} height={CONTENT_HEIGHT} y={CONTENT_Y} radius={12} fill={'#11131A'} clip>
             <Node ref={browserTag} y={-22} scale={2.15}>
               <HtmlTag />
             </Node>
@@ -195,8 +198,7 @@ export default makeScene2D(function* (view) {
             <Video
               ref={doomArtwork}
               src={gameplayVideo}
-              width={CONTENT_WIDTH}
-              height={CONTENT_HEIGHT}
+              width={GAMEPLAY_WIDTH}
               time={16}
               opacity={0}
             />
@@ -224,44 +226,46 @@ export default makeScene2D(function* (view) {
         />
       </Node>
 
-      <Txt
-        ref={plus}
-        text={'+'}
-        y={-80}
-        fill={COLORS.textMuted}
-        fontSize={78}
-        fontFamily={'Arial'}
-        fontWeight={500}
-        opacity={0}
-        scale={0.6}
-      />
-
-      <Node ref={destination} y={210} opacity={0} scale={0.72}>
+      <Node ref={destination} x={0} y={0} opacity={0} scale={0.42} zIndex={5}>
         <FileShape kind={'unknown'} />
+        {[
+          '#75b8ec', COLORS.accent, '#70b879',
+          '#a996ff', '#f3c24f', '#735ee7',
+        ].map((color, index) => (
+          <Rect
+            ref={fusionBarRefs[index]}
+            key={`fusion-${index}`}
+            width={105 - (index % 3) * 12}
+            height={13}
+            radius={7}
+            y={-32 + index * 20}
+            fill={color}
+            opacity={0}
+            scale={[0, 1]}
+          />
+        ))}
       </Node>
 
-      <Line
-        ref={leftPath}
-        points={[[-320, 25], [-170, 120], [-95, 155]]}
-        stroke={COLORS.textMuted}
-        lineWidth={5}
-        lineCap={'round'}
-        endArrow
-        arrowSize={15}
-        end={0}
-        opacity={0}
-      />
-      <Line
-        ref={rightPath}
-        points={[[320, 25], [170, 120], [95, 155]]}
-        stroke={COLORS.textMuted}
-        lineWidth={5}
-        lineCap={'round'}
-        endArrow
-        arrowSize={15}
-        end={0}
-        opacity={0}
-      />
+      {[
+        {data: 'M -155 -62 C -112 -52 -82 28 18 -24', color: '#75b8ec'},
+        {data: 'M -155 -42 C -96 -18 -72 -34 18 0', color: '#70b879'},
+        {data: 'M -155 -22 C -118 10 -58 42 18 24', color: '#f3c24f'},
+        {data: 'M 155 -62 C 112 -52 82 28 -18 -24', color: COLORS.accent},
+        {data: 'M 155 -42 C 96 -18 72 -34 -18 0', color: '#a996ff'},
+        {data: 'M 155 -22 C 118 10 58 42 -18 24', color: '#735ee7'},
+      ].map(({data, color}, index) => (
+        <Path
+          ref={braidRefs[index]}
+          key={`braid-${index}`}
+          data={data}
+          stroke={color}
+          lineWidth={11}
+          lineCap={'round'}
+          end={0}
+          opacity={0}
+          zIndex={3}
+        />
+      ))}
     </Node>,
   );
 
@@ -336,38 +340,63 @@ export default makeScene2D(function* (view) {
     pngFile().x(-350, 0.62, easeInOutCubic),
     pngFile().opacity(1, 0.34, easeOutCubic),
     pngFile().scale(1, 0.62, easeOutCubic),
-    chain(
-      waitFor(0.34),
-      all(
-        plus().opacity(1, 0.24, easeOutCubic),
-        plus().scale(1, 0.30, easeOutCubic),
-      ),
-    ),
   );
-  yield* waitFor(0.06);
+  yield* waitFor(0.08);
 
-  // 9.70–11.20: hold the clear two-input equation.
+  // 9.70–11.20: hold on the two ingredients without reducing them to a
+  // conventional plus-sign equation.
   yield* waitFor(1.50);
 
-  // 11.20–12.44: reveal the unresolved destination and begin convergence.
+  // 11.20–12.55: both files release visible data strands toward the centre.
+  // As the braid completes, the sources dissolve and one larger file forms.
   yield* all(
-    destination().opacity(1, 0.32, easeOutCubic),
-    destination().scale(1, 0.45, easeOutCubic),
-    plus().opacity(0, 0.24, easeInCubic),
+    pngFile().position([-245, -55], 0.72, easeInOutCubic),
+    pngFile().rotation(7, 0.72, easeInOutCubic),
+    htmlFile().position([245, -55], 0.72, easeInOutCubic),
+    htmlFile().rotation(-7, 0.72, easeInOutCubic),
     chain(
-      waitFor(0.32),
-      all(
-        leftPath().opacity(1, 0.01),
-        rightPath().opacity(1, 0.01),
-        leftPath().end(1, 0.68, easeInOutCubic),
-        rightPath().end(1, 0.68, easeInOutCubic),
-        pngFile().position([-285, -105], 0.92, easeInOutCubic),
-        htmlFile().position([285, -105], 0.92, easeInOutCubic),
+      waitFor(0.05),
+      sequence(
+        0.07,
+        ...braidRefs.map(ref => all(
+          ref().opacity(1, 0),
+          ref().end(1, 0.72, easeInOutCubic),
+        )),
       ),
     ),
+    chain(
+      waitFor(0.62),
+      all(
+        pngFile().opacity(0, 0.50, easeInCubic),
+        pngFile().scale(0.28, 0.50, easeInCubic),
+        htmlFile().opacity(0, 0.50, easeInCubic),
+        htmlFile().scale(0.28, 0.50, easeInCubic),
+      ),
+    ),
+    chain(
+      waitFor(0.68),
+      all(
+        destination().opacity(1, 0.32, easeOutCubic),
+        destination().scale(1.20, 0.52, easeOutCubic),
+      ),
+    ),
+    chain(
+      waitFor(0.82),
+      sequence(
+        0.05,
+        ...fusionBarRefs.map(ref => all(
+          ref().opacity(1, 0.18, easeOutCubic),
+          ref().scale([1, 1], 0.28, easeOutCubic),
+        )),
+      ),
+    ),
+    chain(
+      waitFor(1.00),
+      all(...braidRefs.map(ref => ref().opacity(0, 0.20, easeInCubic))),
+    ),
   );
-  yield* waitFor(0.76);
+  yield* waitFor(0.65);
 
-  // 12.44–14.00: unresolved final composition for the Scene 6 handoff.
+  // 12.55–14.00: hold the larger combined file for the Scene 6 handoff.
   yield* waitFor(0.80);
 });
