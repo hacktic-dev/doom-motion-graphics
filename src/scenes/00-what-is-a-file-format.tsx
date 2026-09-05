@@ -1,6 +1,8 @@
 import {Rect, Txt, makeScene2D} from '@motion-canvas/2d';
 
 import {
+  all,
+  chain,
   createRef,
   easeInOutCubic,
   waitFor,
@@ -48,6 +50,7 @@ export default makeScene2D(function* (view) {
       shadowColor={COLORS.shadow}
       shadowBlur={22}
       shadowOffsetY={10}
+      opacity={0}
       clip
     >
       <Txt
@@ -63,10 +66,13 @@ export default makeScene2D(function* (view) {
     </Rect>,
   );
 
-  yield* pill().width(
-    PILL_WIDTH,
-    PILL_IN_DURATION,
-    easeInOutCubic,
+  yield* all(
+    pill().width(
+      PILL_WIDTH,
+      PILL_IN_DURATION,
+      easeInOutCubic,
+    ),
+    pill().opacity(1, 0.14, easeInOutCubic),
   );
 
   yield* waitFor(BEFORE_TYPE_DELAY);
@@ -80,9 +86,15 @@ export default makeScene2D(function* (view) {
 
   yield* waitFor(FINISHED_HOLD);
 
-  yield* pill().width(
-    COLLAPSED_WIDTH,
-    PILL_OUT_DURATION,
-    easeInOutCubic,
+  yield* all(
+    pill().width(
+      COLLAPSED_WIDTH,
+      PILL_OUT_DURATION,
+      easeInOutCubic,
+    ),
+    chain(
+      waitFor(PILL_OUT_DURATION - 0.16),
+      pill().opacity(0, 0.16, easeInOutCubic),
+    ),
   );
 });
