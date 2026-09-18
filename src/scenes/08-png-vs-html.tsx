@@ -424,11 +424,13 @@ function ImageViewer() {
         />
 
         <Rect
-          width={1140}
+          width={1080}
           height={720}
           y={VIEWER_CONTENT_Y}
-          radius={12}
+          radius={14}
           fill={'rgba(0,0,0,0)'}
+          stroke={COLORS.border}
+          lineWidth={3}
           clip
         >
           <Node scale={1.5}>
@@ -706,7 +708,7 @@ export default makeScene2D(function* (view) {
   // paths are slow, shallow arcs rather than synchronized mechanical hops.
   // Let the hidden fragments breathe first, then use the remainder of the
   // existing hold to reveal what the PNG viewer is completely unaware of.
-  const ghostDuration = 3.0;
+  const ghostDuration = 5.5;
   const ghostBases = [
     {node: ghostA, x: -650, y: -205, rotation: -7, phase: 0.15, direction: 1},
     {node: ghostB, x: 650, y: -190, rotation: 6, phase: 1.70, direction: -1},
@@ -762,7 +764,7 @@ export default makeScene2D(function* (view) {
   );
 
   // Hold completely still so the motion reads as a simple out-and-back peek.
-  yield* waitFor(2.0);
+  yield* waitFor(2.5);
 
   yield* all(
     doomPeek().x(560, 0.75, easeInOutCubic),
@@ -790,7 +792,7 @@ export default makeScene2D(function* (view) {
     ghostD().opacity(0.56, 0.82, easeOutCubic),
   );
 
-  // Preserve the original Scene 8 runtime; timing changes remain in Resolve.
+  // Briefly hold the exact Scene 9 handoff frame after the extended sequence.
   yield* waitFor(0.40);
 
   yield* waitFor(pace(0.20));

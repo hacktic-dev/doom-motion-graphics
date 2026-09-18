@@ -41,6 +41,7 @@ const WINDOW_HEIGHT = 842;
 const TITLEBAR_HEIGHT = 58;
 const TITLEBAR_Y = -WINDOW_HEIGHT / 2 + TITLEBAR_HEIGHT / 2;
 const CONTENT_WIDTH = 1140;
+const IMAGE_CONTENT_WIDTH = 1080;
 const CONTENT_HEIGHT = 720;
 const CONTENT_Y = 29;
 
@@ -133,6 +134,7 @@ function FinalFile() {
 export default makeScene2D(function* (view) {
   const window = createRef<Node>();
   const programBackdrop = createRef<Rect>();
+  const contentViewport = createRef<Rect>();
   const imageLayer = createRef<Node>();
   const htmlLayer = createRef<Node>();
   const gameplay = createRef<Video>();
@@ -185,11 +187,14 @@ export default makeScene2D(function* (view) {
           />
 
           <Rect
-            width={CONTENT_WIDTH}
+            ref={contentViewport}
+            width={IMAGE_CONTENT_WIDTH}
             height={CONTENT_HEIGHT}
             y={CONTENT_Y}
-            radius={12}
+            radius={14}
             fill={'rgba(0,0,0,0)'}
+            stroke={COLORS.border}
+            lineWidth={3}
             clip
           >
             <Rect
@@ -198,7 +203,7 @@ export default makeScene2D(function* (view) {
               height={CONTENT_HEIGHT}
               fill={'#11131A'}
               opacity={0}
-              scale={[1080 / CONTENT_WIDTH, 1]}
+              scale={[IMAGE_CONTENT_WIDTH / CONTENT_WIDTH, 1]}
             />
             <Node ref={imageLayer} scale={1.5}>
               <Scene4Landscape />
@@ -295,6 +300,7 @@ export default makeScene2D(function* (view) {
     imageTitle().opacity(0, 0.22, easeInCubic),
     imageLayer().opacity(0.10, 0.55, easeInCubic),
     imageLayer().scale([1.5833, 1.5], 0.55, easeInOutCubic),
+    contentViewport().width(CONTENT_WIDTH, 0.55, easeInOutCubic),
     programBackdrop().opacity(1, 0.42, easeInCubic),
     programBackdrop().scale([1, 1], 0.55, easeInOutCubic),
     ...ghostRefs.map(ref => ref().opacity(0, 0.42, easeInCubic)),

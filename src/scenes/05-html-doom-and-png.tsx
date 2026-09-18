@@ -178,7 +178,16 @@ export default makeScene2D(function* (view) {
             fontFamily={'monospace'}
             textAlign={'center'}
           />
-          <Rect width={CONTENT_WIDTH} height={CONTENT_HEIGHT} y={CONTENT_Y} radius={12} fill={'#11131A'} clip>
+          <Rect
+            width={CONTENT_WIDTH}
+            height={CONTENT_HEIGHT}
+            y={CONTENT_Y}
+            radius={14}
+            fill={'#11131A'}
+            stroke={COLORS.border}
+            lineWidth={3}
+            clip
+          >
             <Node ref={browserTag} y={-22} scale={2.15}>
               <HtmlTag />
             </Node>
